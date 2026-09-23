@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node & Frontend dependencies
+node_modules/
+.pytest_cache/
+test-results/
+playwright-report/
+.cache/

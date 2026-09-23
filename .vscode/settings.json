@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "enterprise-design-system": {
+      "command": "python3",
+      "args": ["packages/mcp-server/server.py"],
+      "env": {
+        "MCP_MODE": "stdio"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-playwright"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSER_CHANNEL": "msedge"
+      }
+    }
+  }
+}

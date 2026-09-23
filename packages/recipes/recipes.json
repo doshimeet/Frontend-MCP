@@ -1,0 +1,87 @@
+[
+  {
+    "name": "CrudTableRecipe",
+    "title": "Enterprise CRUD Data Table",
+    "description": "High-density enterprise table layout featuring search & filter controls, actionable status tags, bulk selection, pagination, loading skeletons, and interactive empty states.",
+    "best_for": "Entity management, audit logs, customer invoices, transactions, records lists.",
+    "file": "CrudTableRecipe.tsx",
+    "required_components": [
+      "DataTable",
+      "Table",
+      "TableHead",
+      "TableRow",
+      "TableHeader",
+      "TableBody",
+      "TableCell",
+      "TableToolbar",
+      "TableToolbarContent",
+      "TableToolbarSearch",
+      "Button",
+      "Tag",
+      "Pagination",
+      "SkeletonText",
+      "InlineNotification"
+    ],
+    "states_handled": [
+      "loading",
+      "empty",
+      "error",
+      "sorted",
+      "paginated",
+      "filtered"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Aria live regions, semantic table markup, visible focus rings)"
+  },
+  {
+    "name": "MetricsDashboardRecipe",
+    "title": "Executive KPI & Operations Dashboard",
+    "description": "Executive dashboard layout with top-line KPI summary cards, trend comparisons, high-density tabular breakdown, and recent activity timeline.",
+    "best_for": "Operations monitoring, business analytics, financial performance overviews, telemetry tracking.",
+    "file": "MetricsDashboardRecipe.tsx",
+    "required_components": [
+      "Tile",
+      "Grid",
+      "Column",
+      "Tag",
+      "DataTable",
+      "Button",
+      "SkeletonText",
+      "InlineNotification"
+    ],
+    "states_handled": [
+      "loading",
+      "empty",
+      "error",
+      "healthy",
+      "warning_threshold"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Stat role descriptions, high contrast metric typography)"
+  },
+  {
+    "name": "FormWizardRecipe",
+    "title": "Multi-Step Intake Form Wizard",
+    "description": "Progressive disclosure multi-step workflow with visual step tracker, inline validation, keyboard navigation, accessible error summary, and sticky bottom action bar.",
+    "best_for": "Account onboarding, patient intake, multi-stage compliance approvals, configuration wizards.",
+    "file": "FormWizardRecipe.tsx",
+    "required_components": [
+      "ProgressIndicator",
+      "ProgressStep",
+      "Form",
+      "FormGroup",
+      "TextInput",
+      "Select",
+      "SelectItem",
+      "Checkbox",
+      "Button",
+      "InlineNotification"
+    ],
+    "states_handled": [
+      "initial",
+      "validating",
+      "step_error",
+      "saving",
+      "completed"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Aria progress tracking, error field association, keyboard focus transfer on step change)"
+  }
+]

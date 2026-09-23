@@ -1,0 +1,146 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "Client-Facing Warm Sage Theme Palette (Editorial, Organic, Professional)",
+  "color": {
+    "$type": "color",
+    "$description": "Warm sage client palette overrides",
+    "primary": {
+      "$value": "#2e5339",
+      "$type": "color",
+      "$description": "Deep forest sage green for primary brand actions"
+    },
+    "primary_hover": {
+      "$value": "#3b6b49",
+      "$type": "color",
+      "$description": "Slightly lighter organic sage for hover interaction"
+    },
+    "primary_active": {
+      "$value": "#1e3825",
+      "$type": "color",
+      "$description": "Deep pine pressed state"
+    },
+    "secondary": {
+      "$value": "#716b60",
+      "$type": "color",
+      "$description": "Warm earthy umber for secondary actions"
+    },
+    "secondary_hover": {
+      "$value": "#5a554c",
+      "$type": "color",
+      "$description": "Hover state for secondary buttons"
+    },
+    "danger": {
+      "$value": "#c93b3b",
+      "$type": "color",
+      "$description": "Soft terracotta red for destructive actions"
+    },
+    "success": {
+      "$value": "#2e7d4d",
+      "$type": "color",
+      "$description": "Fresh herbal green for confirmation and success states"
+    },
+    "warning": {
+      "$value": "#c78326",
+      "$type": "color",
+      "$description": "Warm ochre amber for warnings"
+    },
+    "info": {
+      "$value": "#3b6b49",
+      "$type": "color",
+      "$description": "Sage information badge color"
+    },
+    "background": {
+      "$value": "#fbfaf7",
+      "$type": "color",
+      "$description": "Warm natural linen canvas background"
+    },
+    "surface": {
+      "$value": "#f3f0e8",
+      "$type": "color",
+      "$description": "Soft oatmeal surface for sidebars and section containers"
+    },
+    "surface_raised": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "Crisp white raised card surface"
+    },
+    "text_primary": {
+      "$value": "#1f2420",
+      "$type": "color",
+      "$description": "Deep charcoal-forest body text (WCAG AAA contrast)"
+    },
+    "text_secondary": {
+      "$value": "#5a625b",
+      "$type": "color",
+      "$description": "Muted sage slate for metadata, captions, and secondary details"
+    },
+    "text_placeholder": {
+      "$value": "#9ca39d",
+      "$type": "color",
+      "$description": "Subtle placeholder text"
+    },
+    "text_inverse": {
+      "$value": "#fbfaf7",
+      "$type": "color",
+      "$description": "Light linen text over dark sage buttons"
+    },
+    "border_subtle": {
+      "$value": "#e3ded4",
+      "$type": "color",
+      "$description": "Warm stone subtle divider line"
+    },
+    "border_strong": {
+      "$value": "#b8b1a3",
+      "$type": "color",
+      "$description": "Stone border for active input fields"
+    },
+    "focus": {
+      "$value": "#2e5339",
+      "$type": "color",
+      "$description": "High-contrast sage focus ring"
+    }
+  },
+  "spacing": {
+    "$type": "spacing",
+    "2xs": { "$value": "0.125rem", "$type": "spacing" },
+    "xs": { "$value": "0.25rem", "$type": "spacing" },
+    "sm": { "$value": "0.5rem", "$type": "spacing" },
+    "md": { "$value": "1rem", "$type": "spacing" },
+    "lg": { "$value": "1.5rem", "$type": "spacing" },
+    "xl": { "$value": "2rem", "$type": "spacing" },
+    "2xl": { "$value": "3rem", "$type": "spacing" },
+    "3xl": { "$value": "4rem", "$type": "spacing" }
+  },
+  "typography": {
+    "$type": "typography",
+    "font_family_sans": {
+      "$value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "typography",
+      "$description": "Clean modern sans-serif body font"
+    },
+    "font_family_serif": {
+      "$value": "'Playfair Display', Georgia, Cambria, 'Times New Roman', serif",
+      "$type": "typography",
+      "$description": "Editorial serif heading font"
+    },
+    "font_family_mono": {
+      "$value": "'IBM Plex Mono', 'Courier New', monospace",
+      "$type": "typography"
+    },
+    "font_size_xs": { "$value": "0.75rem", "$type": "typography" },
+    "font_size_sm": { "$value": "0.875rem", "$type": "typography" },
+    "font_size_base": { "$value": "1rem", "$type": "typography" },
+    "font_size_lg": { "$value": "1.25rem", "$type": "typography" },
+    "font_size_xl": { "$value": "1.5rem", "$type": "typography" },
+    "font_size_2xl": { "$value": "2.25rem", "$type": "typography" },
+    "font_size_3xl": { "$value": "3rem", "$type": "typography" }
+  },
+  "radius": {
+    "$type": "radius",
+    "none": { "$value": "0px", "$type": "radius" },
+    "sm": { "$value": "4px", "$type": "radius" },
+    "md": { "$value": "8px", "$type": "radius" },
+    "lg": { "$value": "16px", "$type": "radius" },
+    "full": { "$value": "9999px", "$type": "radius" }
+  }
+}

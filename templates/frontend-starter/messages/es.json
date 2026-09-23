@@ -1,0 +1,29 @@
+{
+  "common": {
+    "appName": "Plataforma Digital",
+    "officialUseOnly": "SÓLO PARA USO OFICIAL — Plataforma Interna del Grupo Banco Mundial",
+    "dashboard": "Panel de Control",
+    "records": "Registros",
+    "settings": "Configuración",
+    "searchPlaceholder": "Buscar proyectos, desembolsos o documentos...",
+    "loading": "Cargando datos...",
+    "emptyTitle": "No se encontraron registros",
+    "emptyDescription": "Intente ajustar su consulta de búsqueda o criterios de filtro.",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear Nuevo",
+    "actions": "Acciones",
+    "status": "Estado",
+    "active": "Activo",
+    "inReview": "En Revisión",
+    "completed": "Completado"
+  },
+  "nav": {
+    "projects": "Proyectos y Operaciones",
+    "disbursements": "Desembolsos",
+    "tenders": "Licitaciones y Adquisiciones",
+    "metrics": "Métricas y Telemetría"
+  }
+}

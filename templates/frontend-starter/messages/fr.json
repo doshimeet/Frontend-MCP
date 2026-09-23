@@ -1,0 +1,29 @@
+{
+  "common": {
+    "appName": "Plateforme Numérique",
+    "officialUseOnly": "RÉSERVÉ À UN USAGE OFFICIEL — Plateforme Interne du Groupe de la Banque Mondiale",
+    "dashboard": "Tableau de Bord",
+    "records": "Dossiers",
+    "settings": "Paramètres",
+    "searchPlaceholder": "Rechercher des projets, décaissements ou documents...",
+    "loading": "Chargement des données...",
+    "emptyTitle": "Aucun enregistrement trouvé",
+    "emptyDescription": "Essayez de modifier votre requête de recherche ou vos critères de filtre.",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer Nouveau",
+    "actions": "Actions",
+    "status": "Statut",
+    "active": "Actif",
+    "inReview": "En Examen",
+    "completed": "Terminé"
+  },
+  "nav": {
+    "projects": "Projets & Opérations",
+    "disbursements": "Décaissements",
+    "tenders": "Appels d'Offres & Passation de Marchés",
+    "metrics": "Métriques & Télémétrie"
+  }
+}

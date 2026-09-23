@@ -1,0 +1,115 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "World Bank Group Official Institutional Theme Palette (DTCG Standard)",
+  "color": {
+    "$type": "color",
+    "$description": "WBG institutional digital color tokens",
+    "primary": {
+      "$value": "#002244",
+      "$type": "color",
+      "$description": "Official WBG Deep Navy primary brand tone"
+    },
+    "primary_hover": {
+      "$value": "#00172e",
+      "$type": "color",
+      "$description": "Hover state for primary institutional actions"
+    },
+    "primary_active": {
+      "$value": "#003366",
+      "$type": "color",
+      "$description": "Active pressed state for primary controls"
+    },
+    "brand_blue": {
+      "$value": "#0071bc",
+      "$type": "color",
+      "$description": "Official WBG Brand Blue for secondary highlights and interactive links"
+    },
+    "accent_cyan": {
+      "$value": "#00a3e0",
+      "$type": "color",
+      "$description": "WBG Accent Cyan for telemetry, active tabs, and focus indicators"
+    },
+    "secondary": {
+      "$value": "#5c768d",
+      "$type": "color",
+      "$description": "Muted slate for secondary actions and table borders"
+    },
+    "secondary_hover": {
+      "$value": "#486075",
+      "$type": "color",
+      "$description": "Hover state for secondary buttons"
+    },
+    "danger": {
+      "$value": "#da1e28",
+      "$type": "color",
+      "$description": "Destructive alert red meeting 4.5:1 contrast on white canvas"
+    },
+    "success": {
+      "$value": "#198038",
+      "$type": "color",
+      "$description": "Forest green for verified disbursements, active projects, and clean states"
+    },
+    "warning": {
+      "$value": "#b28600",
+      "$type": "color",
+      "$description": "Accessible dark gold/amber for risk indicators"
+    },
+    "info": {
+      "$value": "#0071bc",
+      "$type": "color",
+      "$description": "WBG informational indicator"
+    },
+    "background": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "Clean white application canvas"
+    },
+    "surface": {
+      "$value": "#f4f6f8",
+      "$type": "color",
+      "$description": "Institutional slate container and table header surface"
+    },
+    "surface_subtle": {
+      "$value": "#eef2f5",
+      "$type": "color",
+      "$description": "Alternating table row background"
+    },
+    "border": {
+      "$value": "#d0d7de",
+      "$type": "color",
+      "$description": "1px crisp boundary border for cards and data tables"
+    },
+    "text_primary": {
+      "$value": "#001a33",
+      "$type": "color",
+      "$description": "Near-black deep navy text ensuring 12:1 WCAG AAA contrast"
+    },
+    "text_secondary": {
+      "$value": "#4a5568",
+      "$type": "color",
+      "$description": "Slate gray for supporting metadata, labels, and table subtext"
+    },
+    "classification_banner": {
+      "$value": "#ffcc00",
+      "$type": "color",
+      "$description": "High-visibility amber yellow for OFFICIAL USE ONLY classification banners"
+    },
+    "classification_text": {
+      "$value": "#1a1a1a",
+      "$type": "color",
+      "$description": "Classification banner bold label color"
+    }
+  },
+  "typography": {
+    "font_family_base": {
+      "$value": "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily",
+      "$description": "Institutional base font family"
+    },
+    "font_family_heading": {
+      "$value": "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily",
+      "$description": "Institutional heading font family"
+    }
+  }
+}

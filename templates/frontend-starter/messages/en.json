@@ -1,0 +1,29 @@
+{
+  "common": {
+    "appName": "Digital Platform",
+    "officialUseOnly": "OFFICIAL USE ONLY — World Bank Group Internal Platform",
+    "dashboard": "Dashboard",
+    "records": "Records",
+    "settings": "Settings",
+    "searchPlaceholder": "Search records, projects, or documents...",
+    "loading": "Loading data...",
+    "emptyTitle": "No records found",
+    "emptyDescription": "Try adjusting your search query or filter criteria.",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create New",
+    "actions": "Actions",
+    "status": "Status",
+    "active": "Active",
+    "inReview": "In Review",
+    "completed": "Completed"
+  },
+  "nav": {
+    "projects": "Projects & Operations",
+    "disbursements": "Disbursements",
+    "tenders": "Tenders & Procurement",
+    "metrics": "Metrics & Telemetry"
+  }
+}

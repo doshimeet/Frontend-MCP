@@ -1,0 +1,140 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "Enterprise B2B High-Density Dark Theme Palette (IBM Carbon Dark G90/G100 Aligned)",
+  "color": {
+    "$type": "color",
+    "$description": "Dark theme color token overrides",
+    "primary": {
+      "$value": "#4589ff",
+      "$type": "color",
+      "$description": "High-contrast electric corporate blue for dark backgrounds"
+    },
+    "primary_hover": {
+      "$value": "#6ea6ff",
+      "$type": "color",
+      "$description": "Hover state for primary actions in dark mode"
+    },
+    "primary_active": {
+      "$value": "#0f62fe",
+      "$type": "color",
+      "$description": "Active state for primary actions in dark mode"
+    },
+    "secondary": {
+      "$value": "#6f6f6f",
+      "$type": "color",
+      "$description": "Secondary dark action controls"
+    },
+    "secondary_hover": {
+      "$value": "#8d8d8d",
+      "$type": "color",
+      "$description": "Secondary hover state in dark mode"
+    },
+    "danger": {
+      "$value": "#fa4d56",
+      "$type": "color",
+      "$description": "High-visibility red for destructive actions on dark surfaces"
+    },
+    "success": {
+      "$value": "#42be65",
+      "$type": "color",
+      "$description": "Vibrant emerald green for positive status indicators in dark mode"
+    },
+    "warning": {
+      "$value": "#f1c21b",
+      "$type": "color",
+      "$description": "High-contrast amber warning indicator"
+    },
+    "info": {
+      "$value": "#4589ff",
+      "$type": "color",
+      "$description": "Informational announcements in dark theme"
+    },
+    "background": {
+      "$value": "#161616",
+      "$type": "color",
+      "$description": "Base dark canvas background (Carbon G100)"
+    },
+    "surface": {
+      "$value": "#262626",
+      "$type": "color",
+      "$description": "Container, table row, and sidebar surface layer (Carbon G90)"
+    },
+    "surface_raised": {
+      "$value": "#393939",
+      "$type": "color",
+      "$description": "Raised card and modal surface against dark canvas"
+    },
+    "text_primary": {
+      "$value": "#f4f4f4",
+      "$type": "color",
+      "$description": "Primary high-contrast dark mode typography (> 12:1 WCAG ratio)"
+    },
+    "text_secondary": {
+      "$value": "#c6c6c6",
+      "$type": "color",
+      "$description": "Secondary muted text and column headers in dark mode"
+    },
+    "text_placeholder": {
+      "$value": "#6f6f6f",
+      "$type": "color",
+      "$description": "Placeholder input text for dark mode"
+    },
+    "text_inverse": {
+      "$value": "#161616",
+      "$type": "color",
+      "$description": "Text rendered over bright highlights in dark mode"
+    },
+    "border_subtle": {
+      "$value": "#393939",
+      "$type": "color",
+      "$description": "Subtle dark divider lines and table grid borders"
+    },
+    "border_strong": {
+      "$value": "#6f6f6f",
+      "$type": "color",
+      "$description": "High-contrast dark mode input and modal outlines"
+    },
+    "focus": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "Dual-ring high-contrast white focus outline on dark canvas"
+    }
+  },
+  "spacing": {
+    "$type": "spacing",
+    "2xs": { "$value": "0.125rem", "$type": "spacing" },
+    "xs": { "$value": "0.25rem", "$type": "spacing" },
+    "sm": { "$value": "0.5rem", "$type": "spacing" },
+    "md": { "$value": "1rem", "$type": "spacing" },
+    "lg": { "$value": "1.5rem", "$type": "spacing" },
+    "xl": { "$value": "2rem", "$type": "spacing" },
+    "2xl": { "$value": "3rem", "$type": "spacing" },
+    "3xl": { "$value": "4rem", "$type": "spacing" }
+  },
+  "typography": {
+    "$type": "typography",
+    "font_family_sans": {
+      "$value": "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "typography"
+    },
+    "font_family_mono": {
+      "$value": "'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', monospace",
+      "$type": "typography"
+    },
+    "font_size_xs": { "$value": "0.75rem", "$type": "typography" },
+    "font_size_sm": { "$value": "0.875rem", "$type": "typography" },
+    "font_size_base": { "$value": "1rem", "$type": "typography" },
+    "font_size_lg": { "$value": "1.25rem", "$type": "typography" },
+    "font_size_xl": { "$value": "1.5rem", "$type": "typography" },
+    "font_size_2xl": { "$value": "2rem", "$type": "typography" },
+    "font_size_3xl": { "$value": "2.5rem", "$type": "typography" }
+  },
+  "radius": {
+    "$type": "radius",
+    "none": { "$value": "0px", "$type": "radius" },
+    "sm": { "$value": "2px", "$type": "radius" },
+    "md": { "$value": "4px", "$type": "radius" },
+    "lg": { "$value": "8px", "$type": "radius" },
+    "full": { "$value": "9999px", "$type": "radius" }
+  }
+}

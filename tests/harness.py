@@ -17,8 +17,8 @@ import json
 import sys
 from pathlib import Path
 
-# Add packages/mcp-server to sys.path
-SERVER_DIR = Path(__file__).resolve().parent.parent / "packages" / "mcp-server"
+# Add repository root to sys.path
+SERVER_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SERVER_DIR))
 
 from services.health_service import HealthService

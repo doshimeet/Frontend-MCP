@@ -2,7 +2,7 @@
   "mcpServers": {
     "enterprise-design-system": {
       "command": "python3",
-      "args": ["packages/mcp-server/server.py"],
+      "args": ["server.py"],
       "env": {
         "MCP_MODE": "stdio"
       }

@@ -53,12 +53,12 @@ def test_environment_mode_resolution():
     assert resolve_active_mode() == "cloud"
     del os.environ["WEBSITE_SITE_NAME"]
 
-    # 5. Non-enterprise laptop fallback (defaults to carbon)
+    # 5. Non-enterprise laptop fallback (defaults to standalone or wbg)
     # Ensure no enterprise credentials are in test env
     old_pat = os.environ.pop("AZURE_DEVOPS_PAT", None)
     try:
         mode = resolve_active_mode()
-        assert mode in ("carbon", "wbg")
+        assert mode in ("standalone", "carbon", "wbg")
     finally:
         if old_pat:
             os.environ["AZURE_DEVOPS_PAT"] = old_pat
@@ -83,7 +83,7 @@ def test_requirements_service_input_modality_detection():
         theme="enterprise-dark",
     )
     assert prd_plan.input_modality in ("prd", "text_prd")
-    assert prd_plan.active_mode in ("carbon", "wbg", "cloud")
+    assert prd_plan.active_mode in ("standalone", "carbon", "wbg", "cloud")
 
     # Visual Mockup
     mockup_plan = service.plan_from_text(

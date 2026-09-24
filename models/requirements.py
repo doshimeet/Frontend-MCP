@@ -40,8 +40,8 @@ class RequirementBlueprint(BaseModel):
         description="Input format: text_prd, visual_mockup (screenshot/Figma), or hybrid"
     )
     active_mode: str = Field(
-        default="carbon",
-        description="Active operational mode: 'carbon' (non-enterprise), 'wbg' (local enterprise), or 'cloud'"
+        default="standalone",
+        description="Active operational mode: 'standalone' (non-enterprise / offline), 'wbg' (local enterprise), 'cloud', or 'carbon'"
     )
     application_archetype: str = Field(
         default="Enterprise Portal",

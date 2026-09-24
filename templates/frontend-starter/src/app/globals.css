@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /**
  * World Bank Group Nexus Design System - Master CSS Variables & Utility Classes
  * Phase 11 Taste & Impeccable Enterprise Standards

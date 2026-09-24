@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Literal, Optional, List
 import urllib.request
 
-EnvironmentMode = Literal["carbon", "wbg", "cloud"]
+EnvironmentMode = Literal["standalone", "wbg", "cloud", "carbon"]
 
 CANDIDATE_DEV_PORTS: List[int] = [3000, 3001, 4200, 5173]
 
@@ -91,14 +91,14 @@ def has_wbg_credentials() -> bool:
 
 def resolve_active_mode() -> EnvironmentMode:
     """
-    Resolves the active operational mode across 3 environments:
-    - Manual override via DESIGN_SYSTEM_MODE ('carbon', 'wbg', 'cloud')
+    Resolves the active operational mode across environments:
+    - Manual override via DESIGN_SYSTEM_MODE ('standalone', 'wbg', 'cloud', 'carbon')
     - Cloud: Detected via WEBSITE_SITE_NAME or MCP_MODE == 'uvicorn'
     - Local WBG: Detected via reachable Artifactory or active Azure DevOps PAT
-    - Local Carbon (Fallback): For personal laptops / non-enterprise machines without Artifactory
+    - Local Standalone (Fallback): For personal laptops / non-enterprise machines without Artifactory
     """
     explicit = os.getenv("DESIGN_SYSTEM_MODE", "auto").strip().lower()
-    if explicit in ("carbon", "wbg", "cloud"):
+    if explicit in ("standalone", "wbg", "cloud", "carbon"):
         return explicit  # type: ignore
 
     # 1. Cloud Mode (Azure App Service)
@@ -109,5 +109,5 @@ def resolve_active_mode() -> EnvironmentMode:
     if is_wbg_artifactory_reachable() or has_wbg_credentials():
         return "wbg"
 
-    # 3. Local Carbon Mode (Fallback for personal laptops and offline development)
-    return "carbon"
+    # 3. Local Standalone Mode (Fallback for personal laptops and offline development outside WBG VPN)
+    return "standalone"

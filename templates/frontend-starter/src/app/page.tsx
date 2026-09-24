@@ -1,29 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Grid,
-  Column,
-  Tile,
-  Button,
-  Tag,
-  DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
-  Pagination,
-  Modal,
-  TextInput,
-  Select,
-  SelectItem,
-  InlineNotification,
-} from "@carbon/react";
+import Link from "next/link";
 
 interface ServiceRecord {
   id: string;
@@ -77,21 +55,6 @@ const SAMPLE_RECORDS: ServiceRecord[] = [
   },
 ];
 
-const TABLE_HEADERS = [
-  { key: "name", header: "Service Name" },
-  { key: "category", header: "Architecture Tier" },
-  { key: "status", header: "Operational State" },
-  { key: "latency", header: "p95 Latency" },
-  { key: "uptime", header: "30-Day SLA" },
-];
-
-const STATUS_TAGS: Record<ServiceRecord["status"], "green" | "blue" | "magenta" | "red"> = {
-  healthy: "green",
-  deploying: "blue",
-  warning: "magenta",
-  offline: "red",
-};
-
 export default function WelcomeDashboardPage() {
   const [records, setRecords] = useState<ServiceRecord[]>(SAMPLE_RECORDS);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -106,7 +69,8 @@ export default function WelcomeDashboardPage() {
       r.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateService = () => {
+  const handleCreateService = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!newServiceName.trim()) return;
 
     const newRecord: ServiceRecord = {
@@ -128,226 +92,270 @@ export default function WelcomeDashboardPage() {
   };
 
   return (
-    <div className="welcome-dashboard" style={{ maxWidth: "1280px", margin: "0 auto" }}>
+    <div className="welcome-dashboard max-w-7xl mx-auto space-y-8">
       {/* 1. Hero Section */}
-      <section id="welcome-hero" style={{ marginBottom: "2rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+      <section id="welcome-hero" className="border-b border-slate-200 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-              <h1 style={{ fontSize: "2rem", fontWeight: 700, margin: 0 }}>
-                Enterprise Digital Platform
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#002244] tracking-tight">
+                World Bank Group Operations Portal
               </h1>
-              <Tag type="cool-gray" size="md">Next.js 14 App Router</Tag>
-              <Tag type="green" size="md">IBM Carbon v11</Tag>
+              <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                Next.js 14 App Router
+              </span>
+              <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Tailwind CSS & Nexus Tokens
+              </span>
             </div>
-            <p style={{ fontSize: "1rem", color: "var(--cds-text-secondary, #525252)", margin: 0, maxWidth: "720px" }}>
-              AI-Native frontend starter kit wired with strict DTCG design tokens, pre-composed page recipes,
-              and bidirectional FastMCP orchestration.
+            <p className="text-sm md:text-base text-slate-600 max-w-3xl">
+              AI-Native enterprise platform pre-wired with strict DTCG design tokens, Taste Skill & Impeccable
+              quality gates, and autonomous multi-environment detection.
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <Button
+          <div className="flex flex-wrap items-center gap-3">
+            <button
               id="new-record-btn"
-              kind="primary"
-              size="md"
+              type="button"
               onClick={() => setIsModalOpen(true)}
+              className="px-4 py-2 text-xs font-semibold text-white bg-[#0071bc] hover:bg-[#005a96] rounded transition-colors shadow-sm"
             >
               + Register Service
-            </Button>
-            <Button
-              kind="secondary"
-              size="md"
-              onClick={() => window.open("https://react.carbondesignsystem.com", "_blank")}
+            </button>
+            <Link
+              href="/projects"
+              className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors shadow-sm"
             >
-              Carbon Storybook ↗
-            </Button>
+              Projects Directory →
+            </Link>
           </div>
         </div>
       </section>
 
       {/* 2. Notification Banner */}
       {notification && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <InlineNotification
-            kind={notification.kind}
-            title="System Alert"
-            subtitle={notification.message}
-            onCloseButtonClick={() => setNotification(null)}
-          />
+        <div
+          role="alert"
+          className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm"
+        >
+          <div className="flex items-center gap-2">
+            <span aria-hidden="true">✓</span>
+            <span className="font-semibold">Success:</span>
+            <span>{notification.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNotification(null)}
+            className="text-emerald-700 hover:text-emerald-900 font-bold text-xs"
+            aria-label="Dismiss notification"
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {/* 3. KPI Telemetry Grid */}
-      <section id="metrics-grid" style={{ marginBottom: "2.5rem" }}>
-        <Grid fullWidth style={{ padding: 0 }}>
-          <Column lg={3} md={4} sm={4} style={{ marginBottom: "1rem" }}>
-            <Tile style={{ padding: "1.25rem", height: "100%", background: "var(--cds-layer, #ffffff)" }}>
-              <div style={{ fontSize: "0.8125rem", color: "var(--cds-text-secondary, #525252)" }}>MCP Server Engine</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0" }}>Online</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--cds-support-success, #24a148)", fontWeight: 600 }}>
-                ● stdio & SSE Dual-Transport
-              </div>
-            </Tile>
-          </Column>
-
-          <Column lg={3} md={4} sm={4} style={{ marginBottom: "1rem" }}>
-            <Tile style={{ padding: "1.25rem", height: "100%", background: "var(--cds-layer, #ffffff)" }}>
-              <div style={{ fontSize: "0.8125rem", color: "var(--cds-text-secondary, #525252)" }}>Design Tokens (DTCG)</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0" }}>2 Themes</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--cds-text-secondary, #525252)" }}>
-                enterprise-dark & warm-sage
-              </div>
-            </Tile>
-          </Column>
-
-          <Column lg={3} md={4} sm={4} style={{ marginBottom: "1rem" }}>
-            <Tile style={{ padding: "1.25rem", height: "100%", background: "var(--cds-layer, #ffffff)" }}>
-              <div style={{ fontSize: "0.8125rem", color: "var(--cds-text-secondary, #525252)" }}>Canonical Page Recipes</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0" }}>3 Patterns</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--cds-text-secondary, #525252)" }}>
-                CRUD Table, Dashboard, Wizard
-              </div>
-            </Tile>
-          </Column>
-
-          <Column lg={3} md={4} sm={4} style={{ marginBottom: "1rem" }}>
-            <Tile style={{ padding: "1.25rem", height: "100%", background: "var(--cds-layer, #ffffff)" }}>
-              <div style={{ fontSize: "0.8125rem", color: "var(--cds-text-secondary, #525252)" }}>Accessibility Standard</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0" }}>WCAG 2.1 AA</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--cds-support-success, #24a148)", fontWeight: 600 }}>
-                100% Contrast & Focus Verified
-              </div>
-            </Tile>
-          </Column>
-        </Grid>
-      </section>
-
-      {/* 4. Live Carbon DataTable Section */}
-      <section id="crud-datatable" style={{ marginBottom: "2.5rem" }}>
-        <div style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>Registered Architecture Services</h2>
-          <p style={{ fontSize: "0.875rem", color: "var(--cds-text-secondary, #525252)", margin: "0.25rem 0 0" }}>
-            Live Carbon DataTable demonstrating sorting, client-side filtering, accessible status badges, and zero magic CSS.
-          </p>
+      <section id="metrics-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="nexus-kpi-card bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+          <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
+            MCP Server Engine
+          </div>
+          <div className="text-2xl font-bold text-[#002244] mt-2">Online</div>
+          <div className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            stdio & SSE Dual-Transport
+          </div>
         </div>
 
-        <DataTable rows={filteredRecords} headers={TABLE_HEADERS} isSortable>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <div style={{ background: "var(--cds-layer, #ffffff)", border: "1px solid var(--cds-border-subtle, #e0e0e0)" }}>
-              <TableToolbar aria-label="Services table toolbar">
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    persistent
-                    placeholder="Filter services by name or tier..."
-                    value={searchQuery}
-                    onChange={(_evt: any, val?: string) => setSearchQuery(val ?? "")}
-                    id="service-search-input"
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
+        <div className="nexus-kpi-card bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+          <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
+            Design Tokens (DTCG)
+          </div>
+          <div className="text-2xl font-bold text-[#002244] mt-2">DTCG Tokens</div>
+          <div className="text-xs text-slate-500 mt-1">wbg-enterprise & tokens.json</div>
+        </div>
 
-              <Table {...getTableProps()} aria-label="Enterprise Services Table">
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={headers.length} style={{ textAlign: "center", padding: "2rem" }}>
-                        No matching services found for "{searchQuery}".
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    rows.map((row) => {
-                      const item = records.find((r) => r.id === row.id);
-                      return (
-                        <TableRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => {
-                            if (cell.info.header === "status" && item) {
-                              return (
-                                <TableCell key={cell.id}>
-                                  <Tag type={STATUS_TAGS[item.status]} size="sm">
-                                    {item.status.toUpperCase()}
-                                  </Tag>
-                                </TableCell>
-                              );
-                            }
-                            if (cell.info.header === "latency") {
-                              return (
-                                <TableCell key={cell.id}>
-                                  <code style={{ fontFamily: "monospace", fontSize: "0.8125rem" }}>{cell.value}</code>
-                                </TableCell>
-                              );
-                            }
-                            return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                          })}
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
+        <div className="nexus-kpi-card bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+          <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
+            Canonical Page Recipes
+          </div>
+          <div className="text-2xl font-bold text-[#002244] mt-2">6 Recipes</div>
+          <div className="text-xs text-slate-500 mt-1">Table, Dashboard, Wizard, Inspector</div>
+        </div>
 
-              <Pagination
-                backwardText="Previous page"
-                forwardText="Next page"
-                itemsPerPageText="Items per page:"
-                page={1}
-                pageNumberText="Page Number"
-                pageSize={10}
-                pageSizes={[10, 25, 50]}
-                totalItems={filteredRecords.length}
-                onChange={() => {}}
-              />
-            </div>
-          )}
-        </DataTable>
+        <div className="nexus-kpi-card bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+          <div className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
+            Accessibility Standard
+          </div>
+          <div className="text-2xl font-bold text-emerald-600 mt-2">WCAG 2.1 AA</div>
+          <div className="text-xs text-emerald-700 font-semibold mt-1">
+            100% Contrast & Focus Verified
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Live Architecture Services Table */}
+      <section id="crud-datatable" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-[#002244]">Registered Architecture Services</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              High-density service registry with zero ghost dependencies, styled cleanly with Tailwind CSS.
+            </p>
+          </div>
+
+          <div className="w-full sm:w-72">
+            <input
+              id="service-search-input"
+              type="text"
+              placeholder="Filter services by name or tier..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0071bc]"
+              aria-label="Filter architecture services"
+            />
+          </div>
+        </div>
+
+        <div className="nexus-table-container bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="nexus-table w-full text-left text-sm" aria-label="Enterprise Services Table">
+              <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-semibold text-slate-600 tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Service ID</th>
+                  <th className="px-4 py-3">Service Name</th>
+                  <th className="px-4 py-3">Architecture Tier</th>
+                  <th className="px-4 py-3">Operational State</th>
+                  <th className="px-4 py-3 text-right">p95 Latency</th>
+                  <th className="px-4 py-3 text-right">30-Day SLA</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {filteredRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-8 text-slate-500">
+                      No matching services found for &quot;{searchQuery}&quot;.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredRecords.map((item) => (
+                    <tr key={item.id} className="hover:bg-blue-50/30 transition-colors">
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-[#0071bc]">
+                        {item.id}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-slate-900">{item.name}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs">{item.category}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                            item.status === "healthy"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : item.status === "warning"
+                              ? "bg-amber-100 text-amber-900"
+                              : item.status === "deploying"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {item.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-slate-700 tabular-nums">
+                        {item.latency}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs font-medium text-slate-900 tabular-nums">
+                        {item.uptime}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
+            <span>Showing {filteredRecords.length} of {records.length} services</span>
+            <span>WBG Enterprise Quality Gate</span>
+          </div>
+        </div>
       </section>
 
       {/* 5. Modal: Register New Service */}
-      <Modal
-        open={isModalOpen}
-        modalHeading="Register New Architectural Service"
-        primaryButtonText="Confirm Registration"
-        secondaryButtonText="Cancel"
-        onRequestClose={() => setIsModalOpen(false)}
-        onRequestSubmit={handleCreateService}
-      >
-        <div style={{ paddingTop: "1rem" }}>
-          <p style={{ fontSize: "0.875rem", color: "var(--cds-text-secondary, #525252)", marginBottom: "1.5rem" }}>
-            Provide the service details to register it with the enterprise catalog and generate corresponding routes.
-          </p>
+      {isModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 id="modal-headline" className="text-base font-bold text-[#002244]">
+                Register New Architectural Service
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
 
-          <TextInput
-            id="modal-service-name"
-            labelText="Service Name"
-            placeholder="e.g. Identity Authorization Broker"
-            value={newServiceName}
-            onChange={(e) => setNewServiceName(e.target.value)}
-            style={{ marginBottom: "1.25rem" }}
-          />
+            <form onSubmit={handleCreateService} className="space-y-4">
+              <div>
+                <label htmlFor="modal-service-name" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Service Name
+                </label>
+                <input
+                  id="modal-service-name"
+                  type="text"
+                  required
+                  placeholder="e.g. Identity Authorization Broker"
+                  value={newServiceName}
+                  onChange={(e) => setNewServiceName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0071bc]"
+                />
+              </div>
 
-          <Select
-            id="modal-service-category"
-            labelText="Architectural Category"
-            value={newServiceCategory}
-            onChange={(e) => setNewServiceCategory(e.target.value)}
-          >
-            <SelectItem value="Core Services" text="Core Services" />
-            <SelectItem value="AI Runtime" text="AI Runtime" />
-            <SelectItem value="Design System" text="Design System" />
-            <SelectItem value="Data & Analytics" text="Data & Analytics" />
-            <SelectItem value="Security & Compliance" text="Security & Compliance" />
-          </Select>
+              <div>
+                <label htmlFor="modal-service-category" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Architectural Category
+                </label>
+                <select
+                  id="modal-service-category"
+                  value={newServiceCategory}
+                  onChange={(e) => setNewServiceCategory(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0071bc]"
+                >
+                  <option value="Core Services">Core Services</option>
+                  <option value="AI Runtime">AI Runtime</option>
+                  <option value="Design System">Design System</option>
+                  <option value="Data & Analytics">Data & Analytics</option>
+                  <option value="Security & Compliance">Security & Compliance</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#0071bc] hover:bg-[#005a96] rounded shadow-sm"
+                >
+                  Confirm Registration
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

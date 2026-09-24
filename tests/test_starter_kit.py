@@ -48,11 +48,14 @@ def test_starter_kit_package_json_dependencies():
         pkg = json.load(f)
 
     deps = pkg.get("dependencies", {})
+    dev_deps = pkg.get("devDependencies", {})
+    opt_deps = pkg.get("optionalDependencies", {})
     assert "next" in deps
     assert "react" in deps
     assert "react-dom" in deps
-    assert "@wbg/nexus" in deps
+    assert "@wbg/nexus" in deps or "@wbg/nexus" in opt_deps
     assert "@tanstack/react-query" in deps
+    assert "tailwindcss" in dev_deps
 
 
 def test_starter_kit_npmrc_security():

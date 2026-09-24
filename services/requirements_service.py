@@ -83,7 +83,12 @@ class RequirementsService:
         active_mode = mode or ACTIVE_MODE
 
         from config import NEXUS_PACKAGE_NAME
-        package_name = "@carbon/react" if active_mode == "carbon" else NEXUS_PACKAGE_NAME
+        if active_mode == "carbon":
+            package_name = "@carbon/react"
+        elif active_mode == "standalone":
+            package_name = "Standalone (Tailwind CSS + Nexus Tokens)"
+        else:
+            package_name = NEXUS_PACKAGE_NAME
 
         routes: List[PlannedRoute] = []
 
@@ -203,7 +208,13 @@ class RequirementsService:
             recommended_routes=routes,
             design_rules_summary=[
                 "Follow DESIGN.md guidelines strictly.",
-                f"Active mode is '{active_mode}'. Use components from '{package_name}'.",
+                (
+                    "Active mode is 'standalone' (offline / personal laptop outside WBG VPN). "
+                    "Assemble UI using standard React components styled with Tailwind CSS and Nexus tokens (var(--nexus-*)). "
+                    "Do NOT import '@wbg/nexus' or '@carbon/react', and NEVER synthesize fake mock packages or symlinks."
+                    if active_mode == "standalone"
+                    else f"Active mode is '{active_mode}'. Use components from '{package_name}'."
+                ),
                 "Prefer design system catalog components; compose or build token-constrained custom components with clean CSS variables when specialized UX is needed.",
                 "Anti-Force-Fit: If a route has recipe: null, compose directly from atomic primitives rather than contorting into an ill-fitting pattern.",
                 "Ensure high-contrast WCAG 2.1 AA compliance (4.5:1 text, 3:1 graphical elements).",

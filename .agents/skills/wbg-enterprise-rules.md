@@ -32,6 +32,11 @@ This document bridges the general aesthetic guidance of **Taste Skill** (`design
 - **Theme Inversion Protocol**: When custom branding or bespoke palettes are requested, do NOT rewrite component markup. Taste Skill curates the palette and overrides root CSS variables (`:root { --nexus-color-interactive-primary: #...; }`), leaving component architecture untouched.
 - **Contrast Assurance**: Taste Skill (Button Contrast Check) and Impeccable (`colorize.md`) natively verify WCAG AA ($\ge 4.5:1$) contrast on custom themes.
 
+### 1.4 Strict Zero-Mock & Anti-Artificial Package Policy
+- **Absolute Rule**: Under NO circumstances may an AI agent synthesize artificial mock packages (e.g. `src/nexus/index.tsx`, `components/nexus-mock.tsx`), fake library shims, or create manual `node_modules` symlinks.
+- **Standalone Engine Fallback**: If `@wbg/nexus` is not available in the environment (e.g. local laptop, personal workspace outside the World Bank corporate VPN), the agent MUST implement the application using pure React, Tailwind CSS, and `nexus-tokens.css` with Taste Skill and Impeccable design quality.
+- **Dependency Honesty**: If a package is not installed, never fake its existence. Use standard semantic HTML, Tailwind utility classes, and token CSS variables directly.
+
 ---
 
 ## 2. Anti-Slop Architectural Rules

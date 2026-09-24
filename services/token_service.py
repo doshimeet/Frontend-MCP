@@ -47,6 +47,11 @@ DEFAULT_RAW_TOKENS: Dict[str, Dict[str, Dict[str, str]]] = {
         "sm": {"value": "2px"},
         "md": {"value": "6px"},
         "lg": {"value": "8px"},
+    },
+    "elevation": {
+        "subtle": {"value": "0 1px 3px rgba(0, 34, 68, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)", "type": "shadow"},
+        "raised": {"value": "0 4px 12px rgba(0, 34, 68, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)", "type": "shadow"},
+        "floating": {"value": "0 12px 32px rgba(0, 34, 68, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)", "type": "shadow"},
     }
 }
 
@@ -92,6 +97,7 @@ class TokenService:
             spacing=parse_category("spacing"),
             typography=parse_category("typography"),
             radius=parse_category("radius"),
+            elevation=parse_category("elevation"),
         )
 
     def get_category_tokens(self, category: str = "all", theme: str = "default") -> TokenCategoryResponse:
@@ -105,12 +111,33 @@ class TokenService:
             selected = theme_tokens.typography
         elif category == "radius":
             selected = theme_tokens.radius
+        elif category == "elevation":
+            selected = theme_tokens.elevation
         else:
             selected = {
                 **theme_tokens.color,
                 **theme_tokens.spacing,
                 **theme_tokens.typography,
                 **theme_tokens.radius,
+                **theme_tokens.elevation,
             }
 
         return TokenCategoryResponse(category=category, theme=theme, tokens=selected)
+
+    def to_css_variables(self, theme: str = "default") -> str:
+        """Serializes tokens into clean CSS Custom Properties (:root)."""
+        tokens = self.get_theme_tokens(theme)
+        lines = [":root {"]
+        for cat_name, cat_dict in [
+            ("color", tokens.color),
+            ("spacing", tokens.spacing),
+            ("typography", tokens.typography),
+            ("radius", tokens.radius),
+            ("elevation", tokens.elevation),
+        ]:
+            lines.append(f"  /* {cat_name.title()} Tokens */")
+            for name, item in cat_dict.items():
+                var_name = f"--nexus-{cat_name}-{name.replace('_', '-')}"
+                lines.append(f"  {var_name}: {item.value};")
+        lines.append("}")
+        return "\n".join(lines)

@@ -4,22 +4,18 @@ import React, { useState } from "react";
 import {
   Progress,
   Input,
-  Select,
   Button,
   Alert,
   Card,
 } from "@wbg/nexus";
 
 export interface WizardFormData {
-  // Step 1: Enterprise Profile
   orgName: string;
   adminEmail: string;
   department: string;
-  // Step 2: Infrastructure Configuration
   envTier: string;
   cloudRegion: string;
   highAvailability: boolean;
-  // Step 3: Security & Governance
   mfaEnforced: boolean;
   auditRetentionDays: string;
   ipWhitelist: string;
@@ -97,7 +93,7 @@ export const FormWizardRecipe: React.FC<FormWizardRecipeProps> = ({
   const handleBack = () => {
     setErrors({});
     if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
+      setCurrentStep((prev) => prev + 1 - 2);
     }
   };
 
@@ -107,8 +103,7 @@ export const FormWizardRecipe: React.FC<FormWizardRecipeProps> = ({
     setSubmissionError(null);
 
     try {
-      // Simulated cloud provisioning execution
-      await new Promise((res) => setTimeout(res, 1000));
+      await new Promise((res) => setTimeout(res, 800));
       onComplete?.(formData);
       alert("Tenant configuration successfully provisioned!");
     } catch (err: any) {
@@ -118,249 +113,207 @@ export const FormWizardRecipe: React.FC<FormWizardRecipeProps> = ({
     }
   };
 
-  return (
-    <div className="form-wizard-container" style={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: "1.5rem" }}>
-      {/* 1. Header */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 600, margin: 0, color: "var(--cds-text-primary, #161616)" }}>
-          {wizardTitle}
-        </h1>
-        <p style={{ margin: "0.25rem 0 0", color: "var(--cds-text-secondary, #525252)", fontSize: "0.875rem" }}>
-          {wizardSubtitle}
-        </p>
-      </div>
+  const progressPercentage = Math.round(((currentStep + 1) / steps.length) * 100);
 
-      {/* 2. Visual Progress Stepper */}
-      <div style={{ marginBottom: "2.5rem" }}>
-        <ProgressIndicator currentIndex={currentStep} aria-label="Tenant onboarding progression">
+  return (
+    <div className="form-wizard-view">
+      {/* 1. Header Slot */}
+      <header className="nexus-page-header">
+        <div className="nexus-page-header__meta">
+          <span className="nexus-breadcrumb">Provisioning / Guided Setup</span>
+          <h1 className="nexus-page-title">{wizardTitle}</h1>
+          <p className="nexus-page-subtitle">{wizardSubtitle}</p>
+        </div>
+      </header>
+
+      {/* 2. Visual Progress Indicator */}
+      <div className="nexus-wizard-progress" role="progressbar" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100}>
+        <div className="nexus-wizard-steps">
           {steps.map((step, idx) => (
-            <ProgressStep
+            <div
               key={step.label}
-              label={step.label}
-              description={step.secondaryLabel}
-              complete={idx < currentStep}
-              current={idx === currentStep}
-              invalid={idx === currentStep && Object.keys(errors).length > 0}
-            />
+              className={`nexus-wizard-step ${idx === currentStep ? "active" : idx < currentStep ? "completed" : ""}`}
+            >
+              <span className="nexus-wizard-step-number">{idx + 1}</span>
+              <span className="nexus-wizard-step-label">{step.label}</span>
+            </div>
           ))}
-        </ProgressIndicator>
+        </div>
+        <Progress value={progressPercentage} className="nexus-progress-bar" />
       </div>
 
       {/* 3. Error Banner */}
       {submissionError && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <InlineNotification
-            kind="error"
-            title="Provisioning Error"
-            subtitle={submissionError}
-            aria-label="Submission error notification"
-          />
-        </div>
+        <Alert variant="destructive" className="nexus-alert nexus-alert--danger">
+          <strong>Provisioning Error:</strong> {submissionError}
+        </Alert>
       )}
 
-      {/* 4. Multi-Step Form Panes */}
-      <div
-        style={{
-          background: "var(--cds-layer, #ffffff)",
-          border: "1px solid var(--cds-border-subtle, #e0e0e0)",
-          padding: "2rem",
-          minHeight: "340px",
-          borderRadius: "4px",
-        }}
-      >
-        <Form>
-          {/* STEP 0: Organization Profile */}
-          {currentStep === 0 && (
-            <div>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 1.5rem" }}>Organization Profile</h2>
-              <FormGroup legendText="">
-                <TextInput
-                  id="orgName"
-                  labelText="Organization Legal Name"
-                  placeholder="e.g. Acme Health Corp"
-                  value={formData.orgName}
-                  invalid={!!errors.orgName}
-                  invalidText={errors.orgName}
-                  onChange={(e) => setFormData({ ...formData, orgName: e.target.value })}
-                  style={{ marginBottom: "1.25rem" }}
-                />
-
-                <TextInput
-                  id="adminEmail"
-                  labelText="Primary Administrative Email"
-                  placeholder="admin@enterprise.com"
-                  type="email"
-                  value={formData.adminEmail}
-                  invalid={!!errors.adminEmail}
-                  invalidText={errors.adminEmail}
-                  onChange={(e) => setFormData({ ...formData, adminEmail: e.target.value })}
-                  style={{ marginBottom: "1.25rem" }}
-                />
-
-                <Select
-                  id="department"
-                  labelText="Primary Operational Unit"
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                >
-                  <SelectItem value="engineering" text="Engineering & Infrastructure" />
-                  <SelectItem value="finance" text="Finance & Accounting" />
-                  <SelectItem value="clinical" text="Clinical & Healthcare Operations" />
-                  <SelectItem value="legal" text="Legal & Corporate Compliance" />
-                </Select>
-              </FormGroup>
+      {/* 4. Form Content Pane */}
+      <Card className="nexus-card nexus-wizard-card">
+        {currentStep === 0 && (
+          <div className="nexus-form-pane">
+            <h2 className="nexus-section-title">Organization Profile & Identity</h2>
+            <div className="nexus-form-group">
+              <label htmlFor="orgName" className="nexus-label">Organization Legal Name</label>
+              <Input
+                id="orgName"
+                placeholder="e.g. Acme Health Corp"
+                value={formData.orgName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, orgName: e.target.value })}
+              />
+              {errors.orgName && <span className="nexus-field-error">{errors.orgName}</span>}
             </div>
-          )}
 
-          {/* STEP 1: Infrastructure */}
-          {currentStep === 1 && (
-            <div>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 1.5rem" }}>Cloud Infrastructure</h2>
-              <FormGroup legendText="">
-                <Select
-                  id="envTier"
-                  labelText="Deployment Tier"
-                  value={formData.envTier}
-                  onChange={(e) => setFormData({ ...formData, envTier: e.target.value })}
-                  style={{ marginBottom: "1.25rem" }}
-                >
-                  <SelectItem value="production" text="Production (Multi-AZ with Automated Failover)" />
-                  <SelectItem value="staging" text="Staging / Pre-Release" />
-                  <SelectItem value="development" text="Development Sandbox" />
-                </Select>
-
-                <Select
-                  id="cloudRegion"
-                  labelText="Primary Cloud Region"
-                  value={formData.cloudRegion}
-                  invalid={!!errors.cloudRegion}
-                  invalidText={errors.cloudRegion}
-                  onChange={(e) => setFormData({ ...formData, cloudRegion: e.target.value })}
-                  style={{ marginBottom: "1.5rem" }}
-                >
-                  <SelectItem value="eastus" text="US East (Virginia - Azure Data Center)" />
-                  <SelectItem value="westus" text="US West (Washington)" />
-                  <SelectItem value="westeurope" text="West Europe (Amsterdam)" />
-                </Select>
-
-                <Checkbox
-                  id="highAvailability"
-                  labelText="Enable Automated Multi-Zone Geo-Replication"
-                  checked={formData.highAvailability}
-                  onChange={(_, { checked }) => setFormData({ ...formData, highAvailability: checked })}
-                />
-              </FormGroup>
+            <div className="nexus-form-group">
+              <label htmlFor="adminEmail" className="nexus-label">Primary Administrative Email</label>
+              <Input
+                id="adminEmail"
+                type="email"
+                placeholder="admin@enterprise.com"
+                value={formData.adminEmail}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, adminEmail: e.target.value })}
+              />
+              {errors.adminEmail && <span className="nexus-field-error">{errors.adminEmail}</span>}
             </div>
-          )}
 
-          {/* STEP 2: Governance & Security */}
-          {currentStep === 2 && (
-            <div>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 1.5rem" }}>Security & Access Governance</h2>
-              <FormGroup legendText="">
-                <div style={{ marginBottom: "1.25rem" }}>
-                  <Checkbox
-                    id="mfaEnforced"
-                    labelText="Enforce Hardware / FIDO2 Multi-Factor Authentication for all users"
-                    checked={formData.mfaEnforced}
-                    onChange={(_, { checked }) => setFormData({ ...formData, mfaEnforced: checked })}
-                  />
-                </div>
-
-                <Select
-                  id="auditRetentionDays"
-                  labelText="Security Audit Log Retention Schedule"
-                  value={formData.auditRetentionDays}
-                  onChange={(e) => setFormData({ ...formData, auditRetentionDays: e.target.value })}
-                  style={{ marginBottom: "1.25rem" }}
-                >
-                  <SelectItem value="90" text="90 Days (Standard Development)" />
-                  <SelectItem value="365" text="1 Year (SOX / HIPAA Baseline)" />
-                  <SelectItem value="2555" text="7 Years (Financial / Institutional Grade)" />
-                </Select>
-
-                <TextInput
-                  id="ipWhitelist"
-                  labelText="Restricted Corporate IP CIDR Blocks (Optional)"
-                  placeholder="e.g. 198.51.100.0/24, 203.0.113.0/24"
-                  value={formData.ipWhitelist}
-                  onChange={(e) => setFormData({ ...formData, ipWhitelist: e.target.value })}
-                />
-              </FormGroup>
+            <div className="nexus-form-group">
+              <label htmlFor="department" className="nexus-label">Primary Operational Unit</label>
+              <select
+                id="department"
+                className="nexus-select"
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              >
+                <option value="engineering">Engineering & Infrastructure</option>
+                <option value="finance">Finance & Accounting</option>
+                <option value="clinical">Clinical & Healthcare Operations</option>
+                <option value="legal">Legal & Corporate Compliance</option>
+              </select>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* STEP 3: Review & Summary */}
-          {currentStep === 3 && (
-            <div>
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 1rem" }}>Configuration Summary</h2>
-              <p style={{ fontSize: "0.875rem", color: "var(--cds-text-secondary, #525252)", margin: "0 0 1.5rem" }}>
-                Verify all operational settings before provisioning the tenant environment.
-              </p>
-
-              <Tile style={{ marginBottom: "1rem", background: "var(--cds-layer-accent, #f4f4f4)" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", fontSize: "0.875rem" }}>
-                  <div>
-                    <strong>Organization:</strong> {formData.orgName || "Not specified"}
-                  </div>
-                  <div>
-                    <strong>Admin Email:</strong> {formData.adminEmail || "Not specified"}
-                  </div>
-                  <div>
-                    <strong>Tier:</strong> {formData.envTier.toUpperCase()}
-                  </div>
-                  <div>
-                    <strong>Region:</strong> {formData.cloudRegion}
-                  </div>
-                  <div>
-                    <strong>Geo-Replication:</strong> {formData.highAvailability ? "Enabled" : "Disabled"}
-                  </div>
-                  <div>
-                    <strong>MFA Mandate:</strong> {formData.mfaEnforced ? "Enforced" : "Optional"}
-                  </div>
-                  <div>
-                    <strong>Log Retention:</strong> {formData.auditRetentionDays} Days
-                  </div>
-                </div>
-              </Tile>
+        {currentStep === 1 && (
+          <div className="nexus-form-pane">
+            <h2 className="nexus-section-title">Cloud Infrastructure</h2>
+            <div className="nexus-form-group">
+              <label htmlFor="envTier" className="nexus-label">Deployment Tier</label>
+              <select
+                id="envTier"
+                className="nexus-select"
+                value={formData.envTier}
+                onChange={(e) => setFormData({ ...formData, envTier: e.target.value })}
+              >
+                <option value="production">Production (Multi-AZ with Automated Failover)</option>
+                <option value="staging">Staging / Pre-Release</option>
+                <option value="development">Development Sandbox</option>
+              </select>
             </div>
-          )}
-        </Form>
-      </div>
 
-      {/* 5. Sticky Bottom Action Controls */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "1.5rem",
-          padding: "1rem 0",
-          borderTop: "1px solid var(--cds-border-subtle, #e0e0e0)",
-        }}
-      >
-        <Button kind="ghost" size="md" onClick={onCancel || (() => alert("Cancelled"))}>
+            <div className="nexus-form-group">
+              <label htmlFor="cloudRegion" className="nexus-label">Primary Cloud Region</label>
+              <select
+                id="cloudRegion"
+                className="nexus-select"
+                value={formData.cloudRegion}
+                onChange={(e) => setFormData({ ...formData, cloudRegion: e.target.value })}
+              >
+                <option value="eastus">US East (Virginia - Azure Primary)</option>
+                <option value="westus">US West (Washington)</option>
+                <option value="westeurope">West Europe (Amsterdam)</option>
+              </select>
+              {errors.cloudRegion && <span className="nexus-field-error">{errors.cloudRegion}</span>}
+            </div>
+          </div>
+        )}
+
+        {currentStep === 2 && (
+          <div className="nexus-form-pane">
+            <h2 className="nexus-section-title">Security & Access Governance</h2>
+            <div className="nexus-form-group">
+              <label htmlFor="auditRetentionDays" className="nexus-label">Audit Retention Schedule</label>
+              <select
+                id="auditRetentionDays"
+                className="nexus-select"
+                value={formData.auditRetentionDays}
+                onChange={(e) => setFormData({ ...formData, auditRetentionDays: e.target.value })}
+              >
+                <option value="90">90 Days (Standard Development)</option>
+                <option value="365">1 Year (SOX / HIPAA Baseline)</option>
+                <option value="2555">7 Years (Financial / Institutional Grade)</option>
+              </select>
+            </div>
+
+            <div className="nexus-form-group">
+              <label htmlFor="ipWhitelist" className="nexus-label">Restricted Corporate IP CIDR Blocks</label>
+              <Input
+                id="ipWhitelist"
+                placeholder="e.g. 198.51.100.0/24, 203.0.113.0/24"
+                value={formData.ipWhitelist}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, ipWhitelist: e.target.value })}
+              />
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="nexus-form-pane">
+            <h2 className="nexus-section-title">Configuration Summary</h2>
+            <p className="nexus-section-subtitle">
+              Verify all operational parameters before initiating provisioning.
+            </p>
+
+            <div className="nexus-summary-grid">
+              <div className="nexus-summary-item">
+                <span className="nexus-summary-label">Organization:</span>
+                <span className="nexus-summary-value">{formData.orgName || "Not specified"}</span>
+              </div>
+              <div className="nexus-summary-item">
+                <span className="nexus-summary-label">Admin Email:</span>
+                <span className="nexus-summary-value">{formData.adminEmail || "Not specified"}</span>
+              </div>
+              <div className="nexus-summary-item">
+                <span className="nexus-summary-label">Deployment Tier:</span>
+                <span className="nexus-summary-value">{formData.envTier.toUpperCase()}</span>
+              </div>
+              <div className="nexus-summary-item">
+                <span className="nexus-summary-label">Cloud Region:</span>
+                <span className="nexus-summary-value">{formData.cloudRegion}</span>
+              </div>
+              <div className="nexus-summary-item">
+                <span className="nexus-summary-label">Log Retention:</span>
+                <span className="nexus-summary-value">{formData.auditRetentionDays} Days</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* 5. Navigation Controls */}
+      <footer className="nexus-wizard-footer">
+        <Button variant="ghost" size="sm" onClick={onCancel || (() => alert("Cancelled"))}>
           Cancel
         </Button>
 
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+        <div className="nexus-wizard-actions">
           {currentStep > 0 && (
-            <Button kind="secondary" size="md" onClick={handleBack} disabled={isSubmitting}>
+            <Button variant="outline" size="sm" onClick={handleBack} disabled={isSubmitting}>
               Back
             </Button>
           )}
 
           {currentStep < steps.length - 1 ? (
-            <Button kind="primary" size="md" onClick={handleNext}>
+            <Button variant="default" size="sm" onClick={handleNext}>
               Next Step
             </Button>
           ) : (
-            <Button kind="primary" size="md" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button variant="default" size="sm" onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? "Provisioning..." : "Confirm & Provision"}
             </Button>
           )}
         </div>
-      </div>
+      </footer>
     </div>
   );
 };

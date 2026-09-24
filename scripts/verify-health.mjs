@@ -215,6 +215,62 @@ export async function verifyApplicationHealth(targetUrl = null) {
       }
     }
 
+    // Gate 2: Programmatic Anti-Slop Audit
+    let designSlopViolations = [];
+    let designQualityScore = 100;
+    try {
+      const slopResults = await page.evaluate(() => {
+        const issues = [];
+        const h1s = document.querySelectorAll('h1');
+        if (h1s.length > 1) {
+          issues.push(`[Hierarchy Slop] Multiple <h1> headings detected (${h1s.length}). Exactly one <h1> is permitted.`);
+        }
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3'));
+        for (let i = 0; i < headings.length - 1; i++) {
+          const t1 = headings[i].innerText.toLowerCase();
+          const t2 = headings[i + 1].innerText.toLowerCase();
+          const w1 = t1.match(/\w{4,}/g) || [];
+          const w2 = t2.match(/\w{4,}/g) || [];
+          const overlap = w1.filter((w) => w2.includes(w));
+          if (overlap.length >= 2) {
+            issues.push(`[Hierarchy Slop] Stacked redundant headings: <${headings[i].tagName.toLowerCase()}> '${headings[i].innerText.trim()}' followed by <${headings[i + 1].tagName.toLowerCase()}> '${headings[i + 1].innerText.trim()}'.`);
+          }
+        }
+        const styledEls = Array.from(document.querySelectorAll('[style]'));
+        const complexStyles = styledEls.filter((el) => {
+          const s = el.getAttribute('style').toLowerCase();
+          return s.includes('display:') || s.includes('border:') || s.includes('padding:');
+        });
+        if (complexStyles.length > 5) {
+          issues.push(`[Styling Slop] Excessive raw inline styles (${complexStyles.length} elements). Use Nexus utility classes.`);
+        }
+        const yellowBanner = styledEls.some((el) => {
+          const s = el.getAttribute('style').toLowerCase();
+          return s.includes('#ffcc00') || s.includes('rgb(255, 204, 0)');
+        });
+        if (yellowBanner) {
+          issues.push(`[Brand Slop] Unrefined full-width yellow banner detected (#ffcc00). Use .nexus-classification-pill.`);
+        }
+        const allBadges = Array.from(document.querySelectorAll('.cds--tag, [class*="badge"], [class*="chip"]'));
+        const nonTableBadges = allBadges.filter((el) => !el.closest('td, th'));
+        const cells = Array.from(document.querySelectorAll('td, th'));
+        const overpackedCell = cells.find((cell) => cell.querySelectorAll('.cds--tag, [class*="badge"], [class*="chip"]').length > 3);
+
+        if (nonTableBadges.length > 4) {
+          issues.push(`[Badge Overload] Excessive non-tabular badges detected (${nonTableBadges.length} in cards/headers). Limit badges to operational state transitions.`);
+        } else if (overpackedCell) {
+          const count = overpackedCell.querySelectorAll('.cds--tag, [class*="badge"], [class*="chip"]').length;
+          issues.push(`[Badge Overload] Clustered status chips detected inside a single table cell (${count} badges in one cell). Limit cell metadata density.`);
+        }
+        return issues;
+      });
+      designSlopViolations = slopResults;
+      designQualityScore = Math.max(0, 100 - designSlopViolations.length * 15);
+      remediations.push(...designSlopViolations);
+    } catch (e) {
+      // Soft fail
+    }
+
     if (consoleErrors.length > 0) {
       remediations.push(`Fix ${consoleErrors.length} client console error(s) detected during page render.`);
     }
@@ -222,7 +278,7 @@ export async function verifyApplicationHealth(targetUrl = null) {
       remediations.push(`Resolve ${failingRequests.length} failing network request(s) (HTTP 4xx/5xx).`);
     }
 
-    const isHealthy = httpStatus === 200 && consoleErrors.length === 0 && a11yCriticalCount === 0;
+    const isHealthy = httpStatus === 200 && consoleErrors.length === 0 && a11yCriticalCount === 0 && designSlopViolations.length === 0;
 
     return {
       url,
@@ -235,6 +291,8 @@ export async function verifyApplicationHealth(targetUrl = null) {
       interactive_elements_tested: interactiveCount,
       a11y_violations_count: a11yViolationsCount,
       a11y_critical_count: a11yCriticalCount,
+      design_slop_violations: designSlopViolations,
+      design_quality_score: designQualityScore,
       remediations,
     };
   } catch (err) {

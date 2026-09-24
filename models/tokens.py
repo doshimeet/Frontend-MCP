@@ -19,6 +19,7 @@ class ThemeTokens(BaseModel):
     spacing: Dict[str, TokenItem] = Field(default_factory=dict, description="Spacing tokens")
     typography: Dict[str, TokenItem] = Field(default_factory=dict, description="Typography scale tokens")
     radius: Dict[str, TokenItem] = Field(default_factory=dict, description="Border radius tokens")
+    elevation: Dict[str, TokenItem] = Field(default_factory=dict, description="Elevation shadow tokens")
 
 
 class TokenCategoryResponse(BaseModel):

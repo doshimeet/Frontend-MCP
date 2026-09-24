@@ -14,7 +14,7 @@ import {
 } from "@carbon/react";
 import QueryProvider from "../providers/QueryProvider";
 import AuthProvider, { useAuth } from "./auth/AuthProvider";
-import { useTranslation, SupportedLocale } from "../hooks/useTranslation";
+import { useTranslation } from "../hooks/useTranslation";
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -36,46 +36,22 @@ const AppShellInner: React.FC<AppShellProps> = ({ children }) => {
 
   return (
     <Theme theme={currentTheme}>
-      <div className="enterprise-app-wrapper">
+      <div className="nexus-app-container">
         <SkipToContent href="#main-content">Skip to main content</SkipToContent>
 
-        {/* Security Classification Banner for Internal World Bank Group Applications */}
-        {appMode === "internal" && (
-          <div
-            role="region"
-            aria-label="Security Classification Banner"
-            style={{
-              backgroundColor: "var(--cds-support-warning, #ffcc00)",
-              color: "#1a1a1a",
-              padding: "0.35rem 1.5rem",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              borderBottom: "1px solid #d4a700",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              zIndex: 9999,
-              position: "relative",
-            }}
-          >
-            <span style={{ margin: "0 auto", textAlign: "center" }}>
-              🔒 {t("common.officialUseOnly")}
-            </span>
-            {user && (
-              <span style={{ fontSize: "0.6875rem", opacity: 0.9, fontWeight: 500, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span>{user.name}</span>
-                <span style={{ opacity: 0.6 }}>|</span>
-                <span>{user.email}</span>
+        {/* Institutional 56px Header with Integrated Classification Pill */}
+        <Header aria-label="Enterprise Institutional Application Shell" className="nexus-institutional-header">
+          <div className="nexus-header-brand-group">
+            <HeaderName href="/" prefix="WBG">
+              {t("common.appName")}
+            </HeaderName>
+            {appMode === "internal" && (
+              <span className="nexus-classification-pill" aria-label="Security Classification: Official Use Only">
+                OFFICIAL USE ONLY
               </span>
             )}
           </div>
-        )}
 
-        <Header aria-label="Enterprise Design System Application Shell" className="enterprise-shell-header">
-          <HeaderName href="/" prefix="WBG">
-            {t("common.appName")}
-          </HeaderName>
           <HeaderNavigation aria-label="Primary Platform Navigation">
             <HeaderMenuItem href="/" isCurrentPage>
               {t("common.dashboard")}
@@ -85,14 +61,23 @@ const AppShellInner: React.FC<AppShellProps> = ({ children }) => {
             <HeaderMenuItem href="#catalog">Component Catalog</HeaderMenuItem>
             <HeaderMenuItem href="#tokens">Design Tokens</HeaderMenuItem>
           </HeaderNavigation>
+
           <HeaderGlobalBar>
+            {/* User Metadata */}
+            {user && (
+              <div className="nexus-user-meta" aria-label={`Current User: ${user.name}`}>
+                <span className="nexus-user-name">{user.name}</span>
+                <span className="nexus-user-badge">{user.role}</span>
+              </div>
+            )}
+
             {/* Locale Language Switcher */}
             <HeaderGlobalAction
               aria-label={`Language: ${locale.toUpperCase()}. Click to cycle.`}
               onClick={cycleLocale}
               tooltipAlignment="end"
             >
-              <span style={{ fontSize: "0.75rem", padding: "0 0.5rem", fontWeight: 700 }}>
+              <span className="nexus-locale-switcher">
                 🌐 {locale.toUpperCase()}
               </span>
             </HeaderGlobalAction>
@@ -103,38 +88,27 @@ const AppShellInner: React.FC<AppShellProps> = ({ children }) => {
               onClick={toggleTheme}
               tooltipAlignment="end"
             >
-              <span style={{ fontSize: "0.8125rem", padding: "0 0.5rem", fontWeight: 600 }}>
+              <span className="nexus-theme-toggle">
                 {currentTheme === "white" ? "🌙 Dark" : "☀️ Light"}
               </span>
             </HeaderGlobalAction>
           </HeaderGlobalBar>
         </Header>
 
-        <Content id="main-content" className="enterprise-main-content">
+        {/* Main Content Area */}
+        <Content id="main-content" className="nexus-main-content">
           {children}
         </Content>
 
-        <footer
-          style={{
-            padding: "1.5rem 2rem",
-            borderTop: "1px solid var(--cds-border-subtle, #e0e0e0)",
-            backgroundColor: "var(--cds-layer, #f4f4f4)",
-            fontSize: "0.8125rem",
-            color: "var(--cds-text-secondary, #525252)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <div>
-            © 2026 World Bank Group Digital Architecture. Built with Next.js & Enterprise Design System.
+        {/* Institutional Dignified Footer */}
+        <footer className="nexus-footer">
+          <div className="nexus-footer-copyright">
+            © 2026 World Bank Group Digital Architecture. Built with Next.js & Nexus Enterprise Platform.
           </div>
-          <div style={{ display: "flex", gap: "1.5rem" }}>
-            <span>WCAG 2.1 AA Compliant</span>
-            <span>FastMCP Server Connected</span>
-            <span>App Mode: <strong>{appMode.toUpperCase()}</strong></span>
+          <div className="nexus-footer-meta">
+            <span className="nexus-footer-badge">WCAG 2.1 AA Compliant</span>
+            <span className="nexus-footer-badge">FastMCP Server v2.0</span>
+            <span className="nexus-footer-badge">Mode: {appMode.toUpperCase()}</span>
           </div>
         </footer>
       </div>

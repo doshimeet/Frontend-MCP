@@ -3,10 +3,11 @@
 import React, { useState, useMemo } from "react";
 import {
   Table,
-  TableHead,
-  TableRow,
+  Table as DataTable,
   TableHeader,
   TableBody,
+  TableHead,
+  TableRow,
   TableCell,
   Button,
   Tag,
@@ -34,313 +35,202 @@ export interface CrudTableRecipeProps {
   onCreateNew?: () => void;
 }
 
-/**
- * Data hook for fetching tabular records via TanStack Query or REST endpoint.
- */
-export function useTableRecords(apiEndpoint?: string, fallbackData?: TableItem[]) {
-  // If TanStack Query is mounted in the app, this hook cleanly resolves data
-  const [data, setData] = useState<TableItem[]>(fallbackData || []);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (!apiEndpoint) {
-      if (fallbackData) setData(fallbackData);
-      return;
-    }
-    let isMounted = true;
-    setLoading(true);
-    fetch(apiEndpoint)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch`);
-        return res.json();
-      })
-      .then((json) => {
-        if (isMounted) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [apiEndpoint]);
-
-  return { data, loading, error };
-}
-
-
-const TABLE_HEADERS = [
-  { key: "name", header: "Entity Name" },
-  { key: "code", header: "Identifier" },
-  { key: "category", header: "Category" },
-  { key: "status", header: "Lifecycle Status" },
-  { key: "updatedAt", header: "Last Modified" },
-  { key: "owner", header: "Owner" },
+const DEFAULT_ITEMS: TableItem[] = [
+  {
+    id: "REC-001",
+    name: "Enterprise Data Hub Lakehouse",
+    code: "ARC-LAKE-0912",
+    category: "Infrastructure",
+    status: "active",
+    updatedAt: "2026-09-21",
+    owner: "Alex Vance",
+  },
+  {
+    id: "REC-002",
+    name: "Global Payments Settlement Engine",
+    code: "FIN-SETTLE-8831",
+    category: "Finance",
+    status: "active",
+    updatedAt: "2026-09-20",
+    owner: "Elena Rostova",
+  },
+  {
+    id: "REC-003",
+    name: "Customer Onboarding Microservice",
+    code: "SVC-ONBOARD-2019",
+    category: "Customer Experience",
+    status: "pending",
+    updatedAt: "2026-09-18",
+    owner: "Kenji Sato",
+  },
+  {
+    id: "REC-004",
+    name: "Legacy Auth Token Bridge",
+    code: "LEG-SEC-1102",
+    category: "Security",
+    status: "suspended",
+    updatedAt: "2026-08-30",
+    owner: "Marcus Brody",
+  },
+  {
+    id: "REC-005",
+    name: "Q3 Marketing Vendor Contract",
+    code: "CTR-VND-4410",
+    category: "Procurement",
+    status: "archived",
+    updatedAt: "2026-07-12",
+    owner: "David Miller",
+  },
 ];
 
-const STATUS_TAG_TYPES: Record<TableItem["status"], "green" | "blue" | "red" | "gray"> = {
-  active: "green",
-  pending: "blue",
-  suspended: "red",
-  archived: "gray",
-};
-
 export const CrudTableRecipe: React.FC<CrudTableRecipeProps> = ({
-  title = "Records Management",
-  description = "View, search, and manage enterprise operational records across all departments.",
-  initialItems = [
-    {
-      id: "REC-001",
-      name: "Global Healthcare Policy",
-      code: "POL-HLTH-2026",
-      category: "Compliance",
-      status: "active",
-      updatedAt: "2026-09-18",
-      owner: "Sarah Connor",
-    },
-    {
-      id: "REC-002",
-      name: "Enterprise Cloud Migration",
-      code: "PRJ-CLD-8821",
-      category: "Infrastructure",
-      status: "pending",
-      updatedAt: "2026-09-20",
-      owner: "Alex Vance",
-    },
-    {
-      id: "REC-003",
-      name: "Financial Year Audit 2025",
-      code: "AUD-FIN-2025",
-      category: "Finance",
-      status: "active",
-      updatedAt: "2026-09-15",
-      owner: "Elena Rostova",
-    },
-    {
-      id: "REC-004",
-      name: "Legacy VPN Gateway",
-      code: "SYS-VPN-0012",
-      category: "Security",
-      status: "suspended",
-      updatedAt: "2026-08-30",
-      owner: "Marcus Brody",
-    },
-    {
-      id: "REC-005",
-      name: "Q3 Marketing Vendor Contract",
-      code: "CTR-VND-4410",
-      category: "Procurement",
-      status: "archived",
-      updatedAt: "2026-07-12",
-      owner: "David Miller",
-    },
-  ],
+  title = "Enterprise Operations Registry",
+  description = "Authoritative directory of operational resources, workflows, and infrastructure assets.",
+  initialItems = DEFAULT_ITEMS,
   isLoading = false,
   errorMessage = null,
   onRefresh,
   onCreateNew,
 }) => {
-  const [items, setItems] = useState<TableItem[]>(initialItems);
+  const [items] = useState<TableItem[]>(initialItems);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Filter items based on search query
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return items;
-    const query = searchQuery.toLowerCase();
-    return items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        item.code.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query) ||
-        item.owner.toLowerCase().includes(query)
-    );
-  }, [items, searchQuery]);
-
-  // Paginated window
-  const paginatedItems = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredItems.slice(startIndex, startIndex + pageSize);
-  }, [filteredItems, page, pageSize]);
+    return items.filter((item) => {
+      const matchesSearch =
+        !searchQuery.trim() ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.owner.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" || item.category.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [items, searchQuery, selectedCategory]);
 
   return (
-    <div className="crud-table-recipe-container" style={{ width: "100%", padding: "1.5rem" }}>
-      {/* 1. Header Section */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 600, margin: 0, color: "var(--cds-text-primary, #161616)" }}>
-            {title}
-          </h1>
-          <p style={{ margin: "0.25rem 0 0", color: "var(--cds-text-secondary, #525252)", fontSize: "0.875rem" }}>
-            {description}
-          </p>
+    <div className="crud-table-view">
+      {/* 1. Header Slot */}
+      <header className="nexus-page-header">
+        <div className="nexus-page-header__meta">
+          <span className="nexus-breadcrumb">Institutional Registry / Resources</span>
+          <h1 className="nexus-page-title">{title}</h1>
+          <p className="nexus-page-subtitle">{description}</p>
         </div>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+
+        <div className="nexus-page-header__actions">
           {onRefresh && (
-            <Button kind="secondary" size="md" onClick={onRefresh} aria-label="Refresh table data">
+            <Button variant="outline" size="sm" onClick={onRefresh} aria-label="Refresh table data">
               Refresh
             </Button>
           )}
           <Button
-            kind="primary"
-            size="md"
+            variant="default"
+            size="sm"
             onClick={onCreateNew || (() => alert("Create Record modal invoked"))}
             aria-label="Create new record"
           >
             Create Record
           </Button>
         </div>
-      </div>
+      </header>
 
-      {/* 2. Resilient State: Error State */}
+      {/* 2. Error Notification */}
       {errorMessage && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <InlineNotification
-            kind="error"
-            title="Data retrieval failed"
-            subtitle={errorMessage}
-            aria-label="Table loading error notification"
-          />
+        <div className="nexus-alert nexus-alert--danger" role="alert">
+          <strong>Data retrieval failed:</strong> {errorMessage}
         </div>
       )}
 
-      {/* 3. Data Table Layout */}
-      <DataTable rows={paginatedItems} headers={TABLE_HEADERS} isSortable>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-          <div style={{ background: "var(--cds-layer, #ffffff)", border: "1px solid var(--cds-border-subtle, #e0e0e0)" }}>
-            <TableToolbar aria-label="Table operational toolbar">
-              <TableToolbarContent>
-                <TableToolbarSearch
-                  persistent
-                  placeholder="Search by name, ID, category, or owner..."
-                  value={searchQuery}
-                  onChange={(_evt: any, val?: string) => {
-                    setSearchQuery(val ?? "");
-                    setPage(1);
-                  }}
-                  id="crud-table-search"
-                />
-              </TableToolbarContent>
-            </TableToolbar>
+      {/* 3. Composable Toolbar Slot */}
+      <div className="nexus-toolbar" role="toolbar" aria-label="Table filters and search">
+        <div className="nexus-toolbar__filters">
+          <Input
+            type="search"
+            placeholder="Search records by name, code, owner..."
+            value={searchQuery}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            aria-label="Search records"
+            className="nexus-search-input"
+          />
 
-            <Table {...getTableProps()} aria-label={title}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {/* 4. Resilient State: Loading State */}
-                {isLoading ? (
-                  Array.from({ length: 5 }).map((_, idx) => (
-                    <TableRow key={`skeleton-row-${idx}`}>
-                      {headers.map((header) => (
-                        <TableCell key={`skeleton-cell-${header.key}`}>
-                          <SkeletonText paragraph={false} lineCount={1} />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : rows.length === 0 ? (
-                  /* 5. Resilient State: Empty State */
-                  <TableRow>
-                    <TableCell colSpan={headers.length} style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                      <div style={{ maxWidth: "420px", margin: "0 auto" }}>
-                        <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: "0 0 0.5rem" }}>
-                          No matching records found
-                        </h3>
-                        <p style={{ color: "var(--cds-text-secondary, #525252)", fontSize: "0.875rem", margin: "0 0 1rem" }}>
-                          {searchQuery
-                            ? `No records match your search criteria "${searchQuery}". Try clearing your search term.`
-                            : "There are currently no records in this view. Create your first record to begin."}
-                        </p>
-                        {searchQuery ? (
-                          <Button kind="tertiary" size="sm" onClick={() => setSearchQuery("")}>
-                            Clear Search
-                          </Button>
-                        ) : (
-                          <Button kind="primary" size="sm" onClick={onCreateNew}>
-                            Create New Record
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  /* 6. Normal Data Rows */
-                  rows.map((row) => {
-                    const originalItem = items.find((it) => it.id === row.id);
-                    return (
-                      <TableRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => {
-                          if (cell.info.header === "status" && originalItem) {
-                            return (
-                              <TableCell key={cell.id}>
-                                <Tag type={STATUS_TAG_TYPES[originalItem.status]} size="sm">
-                                  {originalItem.status.toUpperCase()}
-                                </Tag>
-                              </TableCell>
-                            );
-                          }
-                          if (cell.info.header === "code") {
-                            return (
-                              <TableCell key={cell.id}>
-                                <code style={{ fontFamily: "var(--cds-code-01, monospace)", fontSize: "0.8125rem" }}>
-                                  {cell.value}
-                                </code>
-                              </TableCell>
-                            );
-                          }
-                          return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                        })}
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
+          <select
+            className="nexus-select"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            aria-label="Filter by category"
+          >
+            <option value="all">All Categories</option>
+            <option value="Infrastructure">Infrastructure</option>
+            <option value="Finance">Finance</option>
+            <option value="Customer Experience">Customer Experience</option>
+            <option value="Security">Security</option>
+            <option value="Procurement">Procurement</option>
+          </select>
+        </div>
 
-            {/* 7. Pagination Controls */}
-            {!isLoading && filteredItems.length > 0 && (
-              <Pagination
-                backwardText="Previous page"
-                forwardText="Next page"
-                itemsPerPageText="Records per page:"
-                page={page}
-                pageNumberText="Page Number"
-                pageSize={pageSize}
-                pageSizes={[10, 25, 50]}
-                totalItems={filteredItems.length}
-                onChange={({ page: newPage, pageSize: newPageSize }) => {
-                  setPage(newPage);
-                  setPageSize(newPageSize);
-                }}
-              />
-            )}
+        <div className="nexus-toolbar__actions">
+          <span className="nexus-record-count">
+            {filteredItems.length} record{filteredItems.length === 1 ? "" : "s"}
+          </span>
+        </div>
+      </div>
+
+      {/* 4. Data View Slot */}
+      <div className="nexus-table-container">
+        {isLoading ? (
+          <div className="nexus-empty-state">
+            <p className="nexus-empty-state__description">Loading registry records...</p>
           </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="nexus-empty-state">
+            <h3 className="nexus-empty-state__title">No matching records found</h3>
+            <p className="nexus-empty-state__description">
+              Try adjusting your search query or category filter to locate records.
+            </p>
+          </div>
+        ) : (
+          <Table className="nexus-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Entity Name</TableHead>
+                <TableHead>Resource Code</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Last Updated</TableHead>
+                <TableHead>Owner</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="nexus-font-medium">{item.name}</TableCell>
+                  <TableCell className="nexus-font-mono">{item.code}</TableCell>
+                  <TableCell>{item.category}</TableCell>
+                  <TableCell>
+                    <Tag
+                      type={
+                        item.status === "active"
+                          ? "green"
+                          : item.status === "pending"
+                          ? "blue"
+                          : item.status === "suspended"
+                          ? "red"
+                          : "gray"
+                      }
+                    >
+                      {item.status.toUpperCase()}
+                    </Tag>
+                  </TableCell>
+                  <TableCell className="nexus-font-mono">{item.updatedAt}</TableCell>
+                  <TableCell>{item.owner}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
-      </DataTable>
+      </div>
     </div>
   );
 };

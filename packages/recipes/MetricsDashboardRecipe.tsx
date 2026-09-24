@@ -6,14 +6,14 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  Tag,
   Table,
-  TableHead,
-  TableRow,
   TableHeader,
   TableBody,
+  TableHead,
+  TableRow,
   TableCell,
   Button,
+  Tag,
 } from "@wbg/nexus";
 
 export interface KpiMetric {
@@ -98,41 +98,27 @@ const DEFAULT_ACTIVITIES: ActivityLogItem[] = [
     id: "act-02",
     timestamp: "2026-09-22 13:42",
     actor: "sarah.connor@corp.internal",
-    action: "Firewall Rule Altered",
-    target: "db-cluster-primary",
+    action: "Security Role Escalated",
+    target: "iam.roles.admin",
     severity: "warning",
   },
   {
     id: "act-03",
     timestamp: "2026-09-22 11:20",
-    actor: "david.miller@corp.internal",
-    action: "User Role Escalation",
-    target: "Group: Global Admins",
-    severity: "critical",
+    actor: "data.pipeline@enterprise.com",
+    action: "ETL Ingestion Completed",
+    target: "dw.analytics.gold",
+    severity: "info",
   },
   {
     id: "act-04",
     timestamp: "2026-09-22 09:05",
-    actor: "telemetry.worker@corp.internal",
-    action: "Database Vacuum Completed",
-    target: "analytics-warehouse-01",
-    severity: "info",
+    actor: "audit.sentinel@enterprise.com",
+    action: "Anomalous Login Pattern Detected",
+    target: "auth.sso.external",
+    severity: "critical",
   },
 ];
-
-const ACTIVITY_HEADERS = [
-  { key: "timestamp", header: "Timestamp" },
-  { key: "actor", header: "Initiating Principal" },
-  { key: "action", header: "Action Executed" },
-  { key: "target", header: "Target Resource" },
-  { key: "severity", header: "Severity" },
-];
-
-const SEVERITY_TAG_TYPES: Record<ActivityLogItem["severity"], "blue" | "magenta" | "red"> = {
-  info: "blue",
-  warning: "magenta",
-  critical: "red",
-};
 
 export const MetricsDashboardRecipe: React.FC<MetricsDashboardRecipeProps> = ({
   dashboardTitle = "Operations & Security Intelligence",
@@ -152,208 +138,127 @@ export const MetricsDashboardRecipe: React.FC<MetricsDashboardRecipeProps> = ({
   };
 
   return (
-    <div className="metrics-dashboard-container" style={{ width: "100%", padding: "1.5rem" }}>
-      {/* 1. Header & Controls */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 600, margin: 0, color: "var(--cds-text-primary, #161616)" }}>
-            {dashboardTitle}
-          </h1>
-          <p style={{ margin: "0.25rem 0 0", color: "var(--cds-text-secondary, #525252)", fontSize: "0.875rem" }}>
-            {subtitle}
-          </p>
+    <div className="metrics-dashboard-view">
+      {/* 1. Header Slot */}
+      <header className="nexus-page-header">
+        <div className="nexus-page-header__meta">
+          <span className="nexus-breadcrumb">Global Operations / Institutional Telemetry</span>
+          <h1 className="nexus-page-title">{dashboardTitle}</h1>
+          <p className="nexus-page-subtitle">{subtitle}</p>
         </div>
 
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <div
-            role="group"
-            aria-label="Select dashboard date range"
-            style={{
-              display: "flex",
-              border: "1px solid var(--cds-border-subtle, #e0e0e0)",
-              borderRadius: "4px",
-              overflow: "hidden",
-            }}
-          >
+        <div className="nexus-page-header__actions">
+          <div role="group" aria-label="Select dashboard date range" className="nexus-btn-group">
             {["7d", "30d", "90d"].map((range) => (
               <button
                 key={range}
                 type="button"
+                className={`nexus-btn-segment ${selectedRange === range ? "active" : ""}`}
                 onClick={() => handleRangeSelect(range)}
-                style={{
-                  padding: "0.5rem 0.875rem",
-                  fontSize: "0.8125rem",
-                  border: "none",
-                  cursor: "pointer",
-                  background: selectedRange === range ? "var(--cds-interactive, #0f62fe)" : "var(--cds-layer, #ffffff)",
-                  color: selectedRange === range ? "#ffffff" : "var(--cds-text-primary, #161616)",
-                  fontWeight: selectedRange === range ? 600 : 400,
-                  transition: "background 0.15s ease",
-                }}
               >
                 {range.toUpperCase()}
               </button>
             ))}
           </div>
 
-          <Button kind="secondary" size="md" onClick={onExportReport || (() => alert("Exporting report..."))}>
+          <Button variant="outline" size="sm" onClick={onExportReport || (() => alert("Exporting report..."))}>
             Export Audit Log
           </Button>
         </div>
-      </div>
+      </header>
 
-      {/* 2. Resilient Error Notification */}
+      {/* 2. Error State */}
       {errorMessage && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <InlineNotification
-            kind="error"
-            title="Telemetry service synchronization error"
-            subtitle={errorMessage}
-            aria-label="Dashboard telemetry error"
-          />
+        <div className="nexus-alert nexus-alert--danger" role="alert">
+          <strong>Telemetry Synchronization Error:</strong> {errorMessage}
         </div>
       )}
 
-      {/* 3. Top-Line KPI Cards */}
-      <Grid fullWidth style={{ padding: 0, marginBottom: "1.5rem" }}>
+      {/* 3. Composable KPI Grid Slot */}
+      <section className="nexus-kpi-grid" aria-label="Key Performance Indicators">
         {kpis.map((kpi) => (
-          <Column key={kpi.id} lg={4} md={4} sm={4} style={{ marginBottom: "1rem" }}>
-            <Tile
-              style={{
-                height: "100%",
-                padding: "1.25rem",
-                borderLeft:
-                  kpi.status === "warning"
-                    ? "4px solid var(--cds-support-warning, #f1c21b)"
-                    : kpi.status === "critical"
-                    ? "4px solid var(--cds-support-error, #da1e28)"
-                    : "4px solid var(--cds-support-success, #24a148)",
-                background: "var(--cds-layer, #ffffff)",
-              }}
-            >
-              <div style={{ fontSize: "0.8125rem", color: "var(--cds-text-secondary, #525252)", marginBottom: "0.5rem" }}>
-                {kpi.label}
-              </div>
-              {isLoading ? (
-                <SkeletonText heading width="75%" />
-              ) : (
-                <div style={{ fontSize: "1.875rem", fontWeight: 700, lineHeight: 1.2, margin: "0.25rem 0" }}>
-                  {kpi.value}
-                </div>
-              )}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginTop: "0.5rem",
-                  fontSize: "0.75rem",
-                  color: "var(--cds-text-secondary, #525252)",
-                }}
-              >
-                <span
-                  style={{
-                    fontWeight: 600,
-                    color: kpi.isPositive
-                      ? "var(--cds-support-success, #24a148)"
-                      : "var(--cds-support-error, #da1e28)",
-                  }}
-                >
-                  {kpi.changePercent}
+          <div key={kpi.id} className="nexus-kpi-card">
+            <div className="nexus-kpi-header">
+              <span className="nexus-kpi-label">{kpi.label}</span>
+              {kpi.status !== "normal" && (
+                <span className={`nexus-badge nexus-badge--${kpi.status === "critical" ? "danger" : "warning"}`}>
+                  {kpi.status}
                 </span>
-                <span>{kpi.trendPeriod}</span>
-              </div>
-            </Tile>
-          </Column>
+              )}
+            </div>
+            <div className="nexus-kpi-value">{isLoading ? "..." : kpi.value}</div>
+            <div className="nexus-kpi-subtext">
+              <span className={kpi.isPositive ? "nexus-trend-up" : "nexus-trend-down"}>
+                {kpi.isPositive ? "↑ " : "↓ "}
+                {kpi.changePercent}
+              </span>
+              <span>{kpi.trendPeriod}</span>
+            </div>
+          </div>
         ))}
-      </Grid>
+      </section>
 
-      {/* 4. Telemetry & Recent Activity Table */}
-      <div
-        style={{
-          background: "var(--cds-layer, #ffffff)",
-          border: "1px solid var(--cds-border-subtle, #e0e0e0)",
-          padding: "1.25rem",
-        }}
-      >
-        <div style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>Recent Security & System Events</h2>
-          <p style={{ margin: "0.25rem 0 0", color: "var(--cds-text-secondary, #525252)", fontSize: "0.8125rem" }}>
-            Immutable audit record of all administrative operations performed in the last 24 hours.
-          </p>
-        </div>
+      {/* 4. Data View Slot (Activity Log) */}
+      <section className="nexus-data-section">
+        <Card className="nexus-card">
+          <CardHeader>
+            <div className="nexus-section-header">
+              <div>
+                <CardTitle>Recent Institutional Events</CardTitle>
+                <p className="nexus-section-subtitle">Real-time audit telemetry across core enterprise services</p>
+              </div>
+            </div>
+          </CardHeader>
 
-        <DataTable rows={recentActivities} headers={ACTIVITY_HEADERS}>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <Table {...getTableProps()} aria-label="Recent System Activities">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoading ? (
-                  Array.from({ length: 4 }).map((_, idx) => (
-                    <TableRow key={`skeleton-act-${idx}`}>
-                      {headers.map((header) => (
-                        <TableCell key={`skeleton-act-cell-${header.key}`}>
-                          <SkeletonText paragraph={false} lineCount={1} />
-                        </TableCell>
-                      ))}
+          <CardContent>
+            {recentActivities.length === 0 ? (
+              <div className="nexus-empty-state">
+                <h3 className="nexus-empty-state__title">No events recorded</h3>
+                <p className="nexus-empty-state__description">
+                  There are no recent audit activities recorded for the selected time range.
+                </p>
+              </div>
+            ) : (
+              <div className="nexus-table-container">
+                <Table className="nexus-table">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Timestamp</TableHead>
+                      <TableHead>Actor</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Target Resource</TableHead>
+                      <TableHead className="nexus-col-number">Severity</TableHead>
                     </TableRow>
-                  ))
-                ) : rows.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={headers.length} style={{ textAlign: "center", padding: "2rem" }}>
-                      No events recorded in this time range.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  rows.map((row) => {
-                    const original = recentActivities.find((a) => a.id === row.id);
-                    return (
-                      <TableRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => {
-                          if (cell.info.header === "severity" && original) {
-                            return (
-                              <TableCell key={cell.id}>
-                                <Tag type={SEVERITY_TAG_TYPES[original.severity]} size="sm">
-                                  {original.severity.toUpperCase()}
-                                </Tag>
-                              </TableCell>
-                            );
-                          }
-                          if (cell.info.header === "target") {
-                            return (
-                              <TableCell key={cell.id}>
-                                <code style={{ fontFamily: "monospace", fontSize: "0.8125rem" }}>{cell.value}</code>
-                              </TableCell>
-                            );
-                          }
-                          return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                        })}
+                  </TableHeader>
+                  <TableBody>
+                    {recentActivities.map((act) => (
+                      <TableRow key={act.id}>
+                        <TableCell className="nexus-font-mono">{act.timestamp}</TableCell>
+                        <TableCell className="nexus-font-medium">{act.actor}</TableCell>
+                        <TableCell>{act.action}</TableCell>
+                        <TableCell className="nexus-font-mono">{act.target}</TableCell>
+                        <TableCell className="nexus-col-number">
+                          <Tag
+                            type={
+                              act.severity === "critical"
+                                ? "red"
+                                : act.severity === "warning"
+                                ? "magenta"
+                                : "blue"
+                            }
+                          >
+                            {act.severity.toUpperCase()}
+                          </Tag>
+                        </TableCell>
                       </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </DataTable>
-      </div>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 };

@@ -53,4 +53,6 @@ class ApplicationHealthReport(BaseModel):
     interactive_elements_tested: int = Field(default=0, description="Count of interactive landmarks (buttons, links, inputs) verified for focusability")
     a11y_violations_count: int = Field(default=0, description="Total accessibility violations found by axe-core")
     a11y_critical_count: int = Field(default=0, description="Critical severity accessibility violations")
+    design_slop_violations: List[str] = Field(default_factory=list, description="Visual taste & anti-slop violations (raw inline styles, stacked headings, badge overload)")
+    design_quality_score: int = Field(default=100, description="Design quality score (100 = impeccable, < 70 = degraded)")
     remediations: List[str] = Field(default_factory=list, description="Actionable remediation suggestions")

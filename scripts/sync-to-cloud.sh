@@ -2,6 +2,9 @@
 # ==============================================================================
 # Synchronize Single Source of Truth ('Design System') to Cloud Mirror ('Frontend-MCP')
 # Safely preserves .git, node_modules symlink, and ignores local cache/temp files.
+
+# npm run sync:cloud
+
 # ==============================================================================
 
 set -euo pipefail

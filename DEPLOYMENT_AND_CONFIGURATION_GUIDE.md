@@ -262,3 +262,80 @@ When developers invoke `create_enterprise_app` through the cloud MCP server:
 3. **Zero `.npmrc` Enforcement**:
    - The engine explicitly deletes any `.npmrc` file during scaffolding.
    - Developers install `@wbg/design-system` seamlessly using their corporate laptop `~/.npmrc` or Azure DevOps `NpmAuthenticate@0` pipeline tasks without leaking credentials into Git.
+
+---
+
+## 7. Multi-Environment Architecture & Auto-Detection
+
+The MCP server operates seamlessly across 3 development environments with zero-config auto-detection:
+
+| Mode | Environment Target | Component Package | Dependency Registry | Auto-Detection Trigger |
+| :--- | :--- | :--- | :--- | :--- |
+| **`carbon`** | Local Personal Laptop | `@carbon/react` | Public npm (npmjs.com) | Default fallback when Artifactory is unreachable |
+| **`wbg`** | Local Enterprise Laptop | `@wbg/design-system` | Private Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
+| **`cloud`** | Azure App Service Container | Dynamic (`@carbon/react` / `@wbg`) | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
+
+### Dynamic Port Probing Chain
+To avoid rigid localhost assumptions, the runtime probes candidate ports in order:
+1. **Port 3000 / 3001**: Next.js / Create-React-App default
+2. **Port 4200**: Angular CLI / Enterprise Micro-Frontends
+3. **Port 5173**: Vite default dev server
+
+---
+
+## 8. Canonical Page Recipes & Companion Playwright Specs
+
+The enterprise catalog delivers 6 pre-composed, production-tested layout patterns with companion Playwright `.spec.ts` test suites using semantic W3C ARIA locators (`getByRole`, `getByLabel`):
+
+1. **`CrudTableRecipe`**: Tabular records, status badges, search filter, loading skeleton, empty states.
+2. **`MetricsDashboardRecipe`**: Executive KPI cards, trend comparisons, event telemetry table, date filters.
+3. **`FormWizardRecipe`**: Multi-step intake flow, step progress tracker, field validation, confirmation summary.
+4. **`MasterDetailRecipe`**: Split-pane directory on left, comprehensive inspector with approval chain and tabs on right.
+5. **`SettingsTabsRecipe`**: Tabbed portal governance layout covering domains, Entra ID MFA, and API secrets.
+6. **`AuditTimelineRecipe`**: Chronological event stream, status transition badges, expandable JSON diff telemetry.
+
+### Dual-Asset FastMCP Retrieval:
+- `get_page_recipe(recipe_name)`: Returns `PageRecipeResponse` with both `.tsx` component code and `.spec.ts` companion test spec.
+- `get_recipe_test(recipe_name)`: Directly extracts the companion Playwright test specification.
+
+---
+
+## 9. Universal Application Health Diagnostics
+
+The server provides a universal, starter-kit agnostic health diagnostics tool:
+```json
+verify_application_health({
+  "url": null
+})
+```
+
+### Capabilities:
+- **Automatic Port Probing**: Scans candidate ports `[3000, 3001, 4200, 5173]` if no explicit URL is passed.
+- **Console Exception Trapping**: Captures browser runtime `console.error` and unhandled page exceptions.
+- **Network Failure Detection**: Logs failing HTTP 4xx and 5xx API calls.
+- **Interactive Element Audit**: Counts focusable landmarks (`button`, `a[href]`, `input`, `select`, `tab`).
+- **WCAG 2.1 AA Evaluation**: Injects and runs `axe-core` to flag critical and serious accessibility violations.
+
+---
+
+## 10. Single Source of Truth & Cloud Deployment Workflow
+
+To eliminate drift between local development and cloud deployment, maintain `/Users/.../Design System` as the **Single Source of Truth (SSOT)**:
+
+### Daily Workflow:
+1. **Develop & Test in `Design System`**:
+   ```bash
+   npm run mcp:test    # Runs all 69 unit and integration tests
+   ```
+2. **Synchronize to Cloud Mirror**:
+   ```bash
+   npm run sync:cloud  # Safe rsync preserving .git, node_modules, and cache
+   ```
+3. **Deploy to Azure App Service QA Slot**:
+   ```bash
+   cd "/Users/meetketankumardoshi/Frontend-MCP"
+   git add .
+   git commit -m "feat: synchronize latest design system updates"
+   git push origin QA
+   ```
+

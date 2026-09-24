@@ -1,0 +1,117 @@
+{
+  "Button": {
+    "import_statement": "import { Button } from '@wbg/design-system';",
+    "description": "Primary interactive button with institutional styling variants (default, secondary, destructive, outline, ghost).",
+    "props": {
+      "variant": { "type": "'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'", "default": "'default'" },
+      "size": { "type": "'default' | 'sm' | 'lg' | 'icon'", "default": "'default'" },
+      "disabled": { "type": "boolean", "default": "false" }
+    },
+    "example": "<Button variant=\"default\" size=\"default\">Submit Proposal</Button>"
+  },
+  "Table": {
+    "import_statement": "import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@wbg/design-system';",
+    "description": "High-density data table supporting sorting, filtering, selection, and responsive layouts.",
+    "props": {
+      "className": { "type": "string", "default": "''" }
+    },
+    "example": "<Table><TableHeader><TableRow><TableHead>ID</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>WBG-001</TableCell></TableRow></TableBody></Table>"
+  },
+  "DataTable": {
+    "import_statement": "import { Table as DataTable, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@wbg/design-system';",
+    "description": "Enterprise data table layout with sorting and filtering capabilities.",
+    "props": {
+      "className": { "type": "string", "default": "''" }
+    },
+    "example": "<DataTable>...</DataTable>"
+  },
+  "Header": {
+    "import_statement": "import { Header } from '@wbg/design-system';",
+    "description": "Top-level application header containing corporate branding and navigation.",
+    "props": {},
+    "example": "<Header />"
+  },
+  "Tile": {
+    "import_statement": "import { Card as Tile } from '@wbg/design-system';",
+    "description": "Container tile for metrics and summaries.",
+    "props": {},
+    "example": "<Tile />"
+  },
+  "Input": {
+    "import_statement": "import { Input } from '@wbg/design-system';",
+    "description": "Text input component with built-in focus-visible rings and validation states.",
+    "props": {
+      "type": { "type": "string", "default": "'text'" },
+      "placeholder": { "type": "string" },
+      "disabled": { "type": "boolean", "default": "false" }
+    },
+    "example": "<Input placeholder=\"Search international tenders...\" />"
+  },
+  "Dialog": {
+    "import_statement": "import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@wbg/design-system';",
+    "description": "Modal overlay dialog for focused workflows, sign-offs, and critical confirmations.",
+    "props": {
+      "open": { "type": "boolean" },
+      "onOpenChange": { "type": "(open: boolean) => void" }
+    },
+    "example": "<Dialog open={isOpen} onOpenChange={setIsOpen}><DialogContent><DialogHeader><DialogTitle>Confirm Sign-off</DialogTitle></DialogHeader></DialogContent></Dialog>"
+  },
+  "Sheet": {
+    "import_statement": "import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@wbg/design-system';",
+    "description": "Slide-out side drawer for detailed inspection, audits, and nested parameters.",
+    "props": {
+      "side": { "type": "'top' | 'bottom' | 'left' | 'right'", "default": "'right'" },
+      "open": { "type": "boolean" }
+    },
+    "example": "<Sheet open={isOpen}><SheetContent side=\"right\"><SheetHeader><SheetTitle>Audit Dossier</SheetTitle></SheetHeader></SheetContent></Sheet>"
+  },
+  "Tag": {
+    "import_statement": "import { Tag } from '@wbg/design-system';",
+    "description": "Status badge chip indicating state, risk levels, and procurement stages.",
+    "props": {
+      "variant": { "type": "'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info'", "default": "'default'" }
+    },
+    "example": "<Tag variant=\"success\">Approved & Cleared</Tag>"
+  },
+  "Card": {
+    "import_statement": "import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@wbg/design-system';",
+    "description": "Container component for metric tiles, dashboard summaries, and structured content sections.",
+    "props": {
+      "className": { "type": "string" }
+    },
+    "example": "<Card><CardHeader><CardTitle>Total Disbursed</CardTitle></CardHeader><CardContent>$4.16B</CardContent></Card>"
+  },
+  "Select": {
+    "import_statement": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@wbg/design-system';",
+    "description": "Accessible dropdown select for procurement methods, sectors, and currencies.",
+    "props": {
+      "value": { "type": "string" },
+      "onValueChange": { "type": "(val: string) => void" }
+    },
+    "example": "<Select value={sector} onValueChange={setSector}><SelectTrigger><SelectValue placeholder=\"Select Sector\" /></SelectTrigger><SelectContent><SelectItem value=\"energy\">Energy</SelectItem></SelectContent></Select>"
+  },
+  "Tabs": {
+    "import_statement": "import { Tabs, TabsList, TabsTrigger, TabsContent } from '@wbg/design-system';",
+    "description": "Tabbed navigation interface for switching between views and domain entities.",
+    "props": {
+      "defaultValue": { "type": "string" }
+    },
+    "example": "<Tabs defaultValue=\"tenders\"><TabsList><TabsTrigger value=\"tenders\">Tenders</TabsTrigger></TabsList></Tabs>"
+  },
+  "Progress": {
+    "import_statement": "import { Progress } from '@wbg/design-system';",
+    "description": "Visual indicator of linear progress, budget utilization, or workflow completion.",
+    "props": {
+      "value": { "type": "number", "default": "0" }
+    },
+    "example": "<Progress value={78} />"
+  },
+  "Alert": {
+    "import_statement": "import { Alert, AlertTitle, AlertDescription } from '@wbg/design-system';",
+    "description": "Callout notification for critical warnings, official classification alerts, and audit flags.",
+    "props": {
+      "variant": { "type": "'default' | 'destructive' | 'warning' | 'success'", "default": "'default'" }
+    },
+    "example": "<Alert variant=\"warning\"><AlertTitle>OFFICIAL USE ONLY</AlertTitle><AlertDescription>Sensitive financial records.</AlertDescription></Alert>"
+  }
+}

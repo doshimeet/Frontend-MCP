@@ -6,8 +6,8 @@ import { defineConfig, devices } from '@playwright/test';
  * Leverages system Edge browser (channel: 'msedge') with graceful fallback to Chrome/Chromium.
  */
 export default defineConfig({
-  testDir: './e2e',
-  timeout: 30 * 1000,
+  testDir: './src/tests',
+  testMatch: /.*\.spec\.ts/,
   expect: {
     timeout: 5000,
   },

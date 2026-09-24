@@ -2,7 +2,7 @@
 Pydantic Schemas for Environment Diagnostics & Health Reports
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 
 
@@ -40,3 +40,17 @@ class HealthReport(BaseModel):
     browser: BrowserInfo = Field(description="Playwright system browser status")
     azure_devops: EnterpriseAuthInfo = Field(description="Azure DevOps authentication status")
     artifactory: ArtifactoryAuthInfo = Field(description="Artifactory npmrc configuration status")
+
+
+class ApplicationHealthReport(BaseModel):
+    url: str = Field(description="Audited application URL")
+    detected_port: int = Field(default=3000, description="Active local dev port (3000, 3001, 4200, 5173)")
+    timestamp: str = Field(description="Audit timestamp in ISO format")
+    http_status: int = Field(default=200, description="HTTP status response code from frontend server")
+    is_healthy: bool = Field(description="Overall pass/fail status (True if HTTP 200, no fatal console exceptions, and no critical a11y violations)")
+    console_errors: List[str] = Field(default_factory=list, description="Trapped browser console.error and unhandled exception messages")
+    failing_requests: List[str] = Field(default_factory=list, description="List of failing HTTP 4xx/5xx network requests")
+    interactive_elements_tested: int = Field(default=0, description="Count of interactive landmarks (buttons, links, inputs) verified for focusability")
+    a11y_violations_count: int = Field(default=0, description="Total accessibility violations found by axe-core")
+    a11y_critical_count: int = Field(default=0, description="Critical severity accessibility violations")
+    remediations: List[str] = Field(default_factory=list, description="Actionable remediation suggestions")

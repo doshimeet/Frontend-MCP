@@ -13,6 +13,7 @@ from typing import Optional
 
 from config import REPO_ROOT
 from models.a11y import A11yAuditReport, A11yViolation, A11yNode
+from models.health import ApplicationHealthReport
 
 
 class A11yService:
@@ -129,3 +130,77 @@ class A11yService:
                     os.remove(report_file_path)
                 except OSError:
                     pass
+
+    def verify_health(self, url: Optional[str] = None, timeout_sec: int = 30) -> ApplicationHealthReport:
+        """
+        Executes verify-health.mjs with dynamic candidate port probing [3000, 3001, 4200, 5173].
+        Traps browser console errors, HTTP 4xx/5xx network failures, and runs axe-core a11y audit.
+        """
+        script = REPO_ROOT / "scripts" / "verify-health.mjs"
+        now_iso = datetime.now(timezone.utc).isoformat()
+        if not script.exists():
+            return ApplicationHealthReport(
+                url=url or "http://localhost:3000",
+                detected_port=3000,
+                timestamp=now_iso,
+                http_status=0,
+                is_healthy=False,
+                console_errors=[f"verify-health.mjs not found at {script}"],
+                remediations=["Ensure scripts/verify-health.mjs is present in the repository root."],
+            )
+
+        cmd = ["node", str(script)]
+        if url:
+            cmd.extend(["--url", url])
+
+        env = os.environ.copy()
+        env.setdefault("PLAYWRIGHT_BROWSER_CHANNEL", "msedge")
+
+        try:
+            res = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout_sec,
+                env=env,
+                cwd=str(REPO_ROOT),
+            )
+            stdout = res.stdout.strip()
+            if stdout:
+                start_idx = stdout.find("{")
+                end_idx = stdout.rfind("}")
+                if start_idx != -1 and end_idx != -1:
+                    raw_json = stdout[start_idx : end_idx + 1]
+                    data = json.loads(raw_json)
+                    return ApplicationHealthReport.model_validate(data)
+
+            return ApplicationHealthReport(
+                url=url or "http://localhost:3000",
+                detected_port=3000,
+                timestamp=now_iso,
+                http_status=res.returncode if res.returncode != 0 else 500,
+                is_healthy=False,
+                console_errors=[res.stderr.strip() or "No output from verify-health.mjs"],
+                remediations=["Check Node.js and Playwright installation."],
+            )
+        except subprocess.TimeoutExpired:
+            return ApplicationHealthReport(
+                url=url or "http://localhost:3000",
+                detected_port=3000,
+                timestamp=now_iso,
+                http_status=504,
+                is_healthy=False,
+                console_errors=[f"Health verification timed out after {timeout_sec}s"],
+                remediations=["Ensure dev server is responding quickly to HTTP requests."],
+            )
+        except Exception as e:
+            return ApplicationHealthReport(
+                url=url or "http://localhost:3000",
+                detected_port=3000,
+                timestamp=now_iso,
+                http_status=500,
+                is_healthy=False,
+                console_errors=[str(e)],
+                remediations=[f"Unexpected error: {str(e)}"],
+            )
+

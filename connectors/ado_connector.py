@@ -14,6 +14,7 @@ from config import (
     AZURE_DEVOPS_ORG,
     AZURE_DEVOPS_PROJECT,
     AZURE_DEVOPS_STARTER_REPO_ID,
+    AZURE_DEVOPS_STARTER_BRANCH,
     TEMPLATES_DIR,
 )
 from core.auth import get_ado_headers, get_azure_devops_token
@@ -22,14 +23,48 @@ from core.auth import get_ado_headers, get_azure_devops_token
 class AzureDevOpsConnector:
     """Connects to Azure DevOps Git REST API using MSAL or PAT authentication."""
 
-    def __init__(self, org_url: Optional[str] = None, project: Optional[str] = None, repo_id: Optional[str] = None):
+    def __init__(
+        self,
+        org_url: Optional[str] = None,
+        project: Optional[str] = None,
+        repo_id: Optional[str] = None,
+        branch: Optional[str] = None,
+    ):
         self.org_url = (org_url or AZURE_DEVOPS_ORG).rstrip("/")
         self.project = project or AZURE_DEVOPS_PROJECT
         self.repo_id = repo_id or AZURE_DEVOPS_STARTER_REPO_ID
+        self.branch = branch or AZURE_DEVOPS_STARTER_BRANCH
 
     def is_authenticated(self) -> bool:
         """Returns True if a valid MSAL or PAT token is available."""
         return get_azure_devops_token() is not None
+
+    def refresh_starter_snapshot(self) -> bool:
+        """
+        Attempts to refresh the local fallback starter snapshot from Azure DevOps during cloud startup.
+        Keeps previous valid snapshot and continues if fetch fails.
+        """
+        if not self.is_authenticated():
+            return False
+        try:
+            import tempfile
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir)
+                res = self.download_starter_archive(temp_path)
+                if res.get("success") and res.get("source") == "azure_devops_rest_api":
+                    TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
+                    for item in temp_path.iterdir():
+                        dest = TEMPLATES_DIR / item.name
+                        if item.is_dir():
+                            if dest.exists():
+                                shutil.rmtree(dest)
+                            shutil.copytree(item, dest)
+                        else:
+                            shutil.copy2(item, dest)
+                    return True
+        except Exception:
+            pass
+        return False
 
     def download_starter_archive(self, target_directory: Path) -> Dict[str, Any]:
         """
@@ -42,7 +77,10 @@ class AzureDevOpsConnector:
         if is_real_ado and self.is_authenticated():
             api_url = (
                 f"{self.org_url}/{self.project}/_apis/git/repositories/"
-                f"{self.repo_id}/items?recursionLevel=full&$format=zip&api-version=6.0"
+                f"{self.repo_id}/items?recursionLevel=full&$format=zip"
+                f"&versionDescriptor.version={self.branch}"
+                f"&versionDescriptor.versionType=branch"
+                f"&api-version=6.0"
             )
             headers = get_ado_headers()
 
@@ -55,7 +93,7 @@ class AzureDevOpsConnector:
                         return {
                             "success": True,
                             "source": "azure_devops_rest_api",
-                            "message": f"Successfully downloaded starter kit from Azure DevOps repo '{self.repo_id}'.",
+                            "message": f"Successfully downloaded starter kit from Azure DevOps repo '{self.repo_id}' branch '{self.branch}'.",
                         }
             except Exception as exc:
                 pass

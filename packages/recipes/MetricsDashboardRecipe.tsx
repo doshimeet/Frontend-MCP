@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import {
-  Tile,
-  Grid,
-  Column,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
   Tag,
-  DataTable,
   Table,
   TableHead,
   TableRow,
@@ -14,9 +14,7 @@ import {
   TableBody,
   TableCell,
   Button,
-  SkeletonText,
-  InlineNotification,
-} from "@carbon/react";
+} from "@wbg/design-system";
 
 export interface KpiMetric {
   id: string;

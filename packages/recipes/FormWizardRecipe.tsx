@@ -2,18 +2,13 @@
 
 import React, { useState } from "react";
 import {
-  ProgressIndicator,
-  ProgressStep,
-  Form,
-  FormGroup,
-  TextInput,
+  Progress,
+  Input,
   Select,
-  SelectItem,
-  Checkbox,
   Button,
-  InlineNotification,
-  Tile,
-} from "@carbon/react";
+  Alert,
+  Card,
+} from "@wbg/design-system";
 
 export interface WizardFormData {
   // Step 1: Enterprise Profile

@@ -5,22 +5,18 @@
     "description": "High-density enterprise table layout featuring search & filter controls, actionable status tags, bulk selection, pagination, loading skeletons, and interactive empty states.",
     "best_for": "Entity management, audit logs, customer invoices, transactions, records lists.",
     "file": "CrudTableRecipe.tsx",
+    "test_file": "CrudTableRecipe.spec.ts",
     "required_components": [
-      "DataTable",
       "Table",
-      "TableHead",
-      "TableRow",
       "TableHeader",
+      "TableRow",
+      "TableHead",
       "TableBody",
       "TableCell",
-      "TableToolbar",
-      "TableToolbarContent",
-      "TableToolbarSearch",
+      "Input",
       "Button",
       "Tag",
-      "Pagination",
-      "SkeletonText",
-      "InlineNotification"
+      "Dialog"
     ],
     "states_handled": [
       "loading",
@@ -38,15 +34,15 @@
     "description": "Executive dashboard layout with top-line KPI summary cards, trend comparisons, high-density tabular breakdown, and recent activity timeline.",
     "best_for": "Operations monitoring, business analytics, financial performance overviews, telemetry tracking.",
     "file": "MetricsDashboardRecipe.tsx",
+    "test_file": "MetricsDashboardRecipe.spec.ts",
     "required_components": [
-      "Tile",
-      "Grid",
-      "Column",
+      "Card",
+      "CardHeader",
+      "CardTitle",
+      "CardContent",
+      "Table",
       "Tag",
-      "DataTable",
-      "Button",
-      "SkeletonText",
-      "InlineNotification"
+      "Button"
     ],
     "states_handled": [
       "loading",
@@ -63,17 +59,13 @@
     "description": "Progressive disclosure multi-step workflow with visual step tracker, inline validation, keyboard navigation, accessible error summary, and sticky bottom action bar.",
     "best_for": "Account onboarding, patient intake, multi-stage compliance approvals, configuration wizards.",
     "file": "FormWizardRecipe.tsx",
+    "test_file": "FormWizardRecipe.spec.ts",
     "required_components": [
-      "ProgressIndicator",
-      "ProgressStep",
-      "Form",
-      "FormGroup",
-      "TextInput",
+      "Progress",
+      "Input",
       "Select",
-      "SelectItem",
-      "Checkbox",
       "Button",
-      "InlineNotification"
+      "Alert"
     ],
     "states_handled": [
       "initial",
@@ -83,5 +75,76 @@
       "completed"
     ],
     "a11y_compliance": "WCAG 2.1 AA (Aria progress tracking, error field association, keyboard focus transfer on step change)"
+  },
+  {
+    "name": "MasterDetailRecipe",
+    "title": "Master-Detail Operations Inspector",
+    "description": "Split-pane layout with searchable record directory on left and comprehensive inspection drawer with tabs, approval chain, and audit timeline on right.",
+    "best_for": "Procurement tenders, loan disbursements, case reviews, claim approvals, and compliance verification.",
+    "file": "MasterDetailRecipe.tsx",
+    "test_file": "MasterDetailRecipe.spec.ts",
+    "required_components": [
+      "Table",
+      "Card",
+      "Tabs",
+      "Sheet",
+      "Tag",
+      "Button",
+      "Input"
+    ],
+    "states_handled": [
+      "loading",
+      "selected",
+      "empty",
+      "filtered",
+      "tab_switched",
+      "action_decision"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Split pane keyboard focus management, aria-selected lists, tablist accessibility)"
+  },
+  {
+    "name": "SettingsTabsRecipe",
+    "title": "Application Governance & Settings Hub",
+    "description": "Multi-section tabbed portal configuration layout covering general domains, Entra ID MFA enforcement, API secrets management, and instant audit notifications.",
+    "best_for": "Portal settings, security controls, API key management, account configurations, and organization preferences.",
+    "file": "SettingsTabsRecipe.tsx",
+    "test_file": "SettingsTabsRecipe.spec.ts",
+    "required_components": [
+      "Tabs",
+      "Input",
+      "Button",
+      "Tag",
+      "Card"
+    ],
+    "states_handled": [
+      "initial",
+      "tab_switched",
+      "dirty_form",
+      "saved_confirmation",
+      "secret_revealed"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Tabpanel aria controls, visible focus rings, field association with accessible labels)"
+  },
+  {
+    "name": "AuditTimelineRecipe",
+    "title": "Chronological Audit & Governance Trail",
+    "description": "Immutable chronological timeline stream capturing security authorizations, disbursements, actor attribution, status change badges, and expandable JSON telemetry diffs.",
+    "best_for": "Governance compliance, audit trails, transaction history, state change reviews, and security event streams.",
+    "file": "AuditTimelineRecipe.tsx",
+    "test_file": "AuditTimelineRecipe.spec.ts",
+    "required_components": [
+      "Card",
+      "Tag",
+      "Button",
+      "Input"
+    ],
+    "states_handled": [
+      "loading",
+      "filtered_category",
+      "searched",
+      "telemetry_expanded",
+      "empty"
+    ],
+    "a11y_compliance": "WCAG 2.1 AA (Semantic timeline landmarks, accessible expand/collapse toggles, high-contrast badges)"
   }
 ]

@@ -2,22 +2,16 @@
 
 import React, { useState, useMemo } from "react";
 import {
-  DataTable,
   Table,
   TableHead,
   TableRow,
   TableHeader,
   TableBody,
   TableCell,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
   Button,
   Tag,
-  Pagination,
-  SkeletonText,
-  InlineNotification,
-} from "@carbon/react";
+  Input,
+} from "@wbg/design-system";
 
 export interface TableItem {
   id: string;

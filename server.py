@@ -128,17 +128,31 @@ register_recipes_resources(mcp)
 register_plan_prd_prompt(mcp)
 register_critique_ui_prompt(mcp)
 
+# 6. Top-Level ASGI Application Export (for Azure App Service / Uvicorn / Gunicorn)
+app = create_cloud_app()
 
-# 6. Dual-Transport Execution
+
+# 7. Dual-Transport Execution
 def main():
     mode = os.getenv("MCP_MODE", MCP_MODE).lower()
 
     if mode in ("uvicorn", "sse", "cloud"):
         import anyio
         import uvicorn
+        from connectors.ado_connector import AzureDevOpsConnector
+
+        # Attempt cloud startup refresh of starter-kit snapshot with resilient fallback
+        try:
+            logger.info("Checking Azure DevOps for starter-kit updates...")
+            refreshed = AzureDevOpsConnector().refresh_starter_snapshot()
+            if refreshed:
+                logger.info("Successfully refreshed starter-kit snapshot from Azure DevOps.")
+            else:
+                logger.info("Using cached local starter-kit snapshot.")
+        except Exception as exc:
+            logger.warning("Startup starter-kit refresh skipped: %s (keeping local snapshot)", exc)
 
         logger.info("Starting Enterprise MCP Server in CLOUD mode (SSE) on %s:%s", MCP_HOST, MCP_PORT)
-        app = create_cloud_app()
         config = uvicorn.Config(
             app,
             host=MCP_HOST,
@@ -154,3 +168,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

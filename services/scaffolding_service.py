@@ -74,6 +74,14 @@ class ScaffoldingService:
             except Exception:
                 pass
 
+        # Guarantee zero .npmrc file compliance (adheres to enterprise credential policy)
+        npmrc_file = target_path / ".npmrc"
+        if npmrc_file.exists():
+            try:
+                npmrc_file.unlink()
+            except Exception:
+                pass
+
         # Re-initialize clean Git repository
         git_dir = target_path / ".git"
         if git_dir.exists():

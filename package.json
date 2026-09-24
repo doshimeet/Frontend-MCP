@@ -1,0 +1,36 @@
+{
+  "name": "enterprise-design-system-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Native Enterprise Design System & Frontend Application Generation Engine",
+  "workspaces": [
+    "packages/*",
+    "templates/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "mcp:local": "python3 server.py",
+    "mcp:cloud": "MCP_MODE=uvicorn python3 server.py",
+    "mcp:test": "python3 -m pytest tests/ -v",
+    "mcp:health": "python3 tests/harness.py health",
+    "mcp:harness": "python3 tests/harness.py",
+    "test:a11y": "node scripts/verify-a11y.mjs",
+    "test:a11y:report": "node scripts/verify-a11y.mjs --report a11y-report.json",
+    "test:self-healing": "node scripts/test-self-healing.mjs",
+    "sync:cloud": "bash scripts/sync-to-cloud.sh"
+  },
+  "keywords": [
+    "design-system",
+    "mcp",
+    "ai-agent",
+    "enterprise",
+    "antigravity",
+    "copilot"
+  ],
+  "author": "Enterprise Architecture Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "axe-core": "^4.13.0",
+    "playwright-core": "^1.63.0"
+  }
+}

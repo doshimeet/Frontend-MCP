@@ -11,16 +11,12 @@ from pathlib import Path
 from typing import Literal
 from dotenv import load_dotenv
 
-# Resolve repository root directory (supports monorepo root, container WORKDIR, or explicit REPO_ROOT)
+# Resolve repository root directory (supports flat root, /home/site/wwwroot on Azure, or explicit REPO_ROOT)
 SERVER_DIR = Path(__file__).resolve().parent
 if os.getenv("REPO_ROOT"):
     REPO_ROOT = Path(os.environ["REPO_ROOT"]).resolve()
-elif (SERVER_DIR.parent.parent / "packages").exists():
-    REPO_ROOT = SERVER_DIR.parent.parent
-elif (SERVER_DIR / "templates").exists():
-    REPO_ROOT = SERVER_DIR
 else:
-    REPO_ROOT = SERVER_DIR.parent.parent
+    REPO_ROOT = SERVER_DIR
 
 # Load .env file from repository root or current working directory
 load_dotenv(REPO_ROOT / ".env")
@@ -29,13 +25,24 @@ load_dotenv(Path.cwd() / ".env")
 # Server Transport Configuration
 MCP_MODE: Literal["stdio", "uvicorn"] = os.getenv("MCP_MODE", "stdio").lower()  # type: ignore
 MCP_HOST: str = os.getenv("MCP_HOST", "0.0.0.0")
-MCP_PORT: int = int(os.getenv("MCP_PORT", os.getenv("WEBSITES_PORT", "8000")))
+MCP_PORT: int = int(os.getenv("PORT", os.getenv("WEBSITES_PORT", os.getenv("MCP_PORT", "8000"))))
 MCP_API_KEY: str | None = os.getenv("MCP_API_KEY")
+
+# Multi-Environment Operational Mode (3 Modes: carbon, wbg, cloud)
+from core.environment import (
+    EnvironmentMode,
+    CANDIDATE_DEV_PORTS,
+    resolve_active_mode,
+    find_active_dev_port,
+    find_active_dev_url,
+)
+ACTIVE_MODE: EnvironmentMode = resolve_active_mode()
 
 # Azure DevOps Configuration
 AZURE_DEVOPS_ORG: str = os.getenv("AZURE_DEVOPS_ORG", "https://dev.azure.com/enterprise-org")
 AZURE_DEVOPS_PROJECT: str = os.getenv("AZURE_DEVOPS_PROJECT", "EnterpriseDigital")
 AZURE_DEVOPS_STARTER_REPO_ID: str = os.getenv("AZURE_DEVOPS_STARTER_REPO_ID", "frontend-starter-kit")
+AZURE_DEVOPS_STARTER_BRANCH: str = os.getenv("AZURE_DEVOPS_BRANCH", "starter-kit")
 AZURE_DEVOPS_PAT: str | None = os.getenv("AZURE_DEVOPS_PAT")
 
 # Artifactory / NPM Registry Configuration
@@ -44,13 +51,16 @@ ARTIFACTORY_NPM_REGISTRY: str = os.getenv(
     "https://artifactory.internal.company.com/artifactory/api/npm/virtual/"
 )
 
-# Workspace Directories
+# Workspace Directories & Catalogs
 TEMPLATES_DIR = REPO_ROOT / "templates" / "frontend-starter"
 RECIPES_DIR = REPO_ROOT / "packages" / "recipes"
 TOKENS_DIR = REPO_ROOT / "packages" / "tokens"
 APPS_DIR = REPO_ROOT / "apps"
+COMPONENTS_JSON_PATH = REPO_ROOT / "components.json"
 
-# Public IBM Carbon Storybook Endpoint (for POC component testing)
+# Storybook Catalog Endpoints
+STORYBOOK_URL = os.getenv("STORYBOOK_URL", "https://storybook.internal.company.com")
+STORYBOOK_MANIFEST_PATH = os.getenv("STORYBOOK_MANIFEST_PATH", "/design-system/index.json")
 CARBON_STORYBOOK_URL = "https://react.carbondesignsystem.com"
 
 

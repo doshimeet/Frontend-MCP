@@ -148,54 +148,61 @@ class StorybookConnector:
         except Exception:
             pass
 
+    def _load_components_json(self) -> Optional[Dict[str, Dict[str, Any]]]:
+        """Loads static Tier-2 fallback from components.json."""
+        from config import COMPONENTS_JSON_PATH
+        if COMPONENTS_JSON_PATH.exists():
+            try:
+                with open(COMPONENTS_JSON_PATH, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                return None
+        return None
+
     def harvest_catalog(self) -> Dict[str, Dict[str, Any]]:
         """
-        Dynamically harvests component definitions.
-        Order of priority:
-        1. Memory cache (if warm)
-        2. Live Storybook index (index.json / stories.json)
+        Dynamically harvests component definitions according to enterprise 3-tier priority:
+        1. Live Storybook endpoint (/design-system/index.json or /index.json)
+        2. Static components.json fallback (reflecting @wbg/design-system)
         3. Local disk cache (.cache/storybook_catalog.json)
-        4. Curated OFFLINE_CARBON_CATALOG
         """
         if self._memory_cache is not None:
             return self._memory_cache
 
-        # Check local disk cache first for fast offline bootstrap
-        disk_data = self._load_disk_cache()
-        if disk_data:
-            self._memory_cache = {**OFFLINE_CARBON_CATALOG, **disk_data}
+        # 1. Tier-1: Live Storybook Harvesting
+        if self.endpoint_url and self.endpoint_url.startswith("http"):
+            from config import STORYBOOK_MANIFEST_PATH
+            endpoints_to_try = [
+                self.endpoint_url.rstrip("/") + STORYBOOK_MANIFEST_PATH,
+                self.endpoint_url.rstrip("/") + "/index.json",
+                self.endpoint_url.rstrip("/") + "/stories.json",
+            ]
+            for url in endpoints_to_try:
+                try:
+                    with httpx.Client(timeout=3.0) as client:
+                        resp = client.get(url)
+                        if resp.status_code == 200:
+                            stories_data = resp.json()
+                            harvested = self._parse_storybook_index(stories_data)
+                            if harvested:
+                                self._save_disk_cache(harvested)
+                                self._memory_cache = harvested
+                                return self._memory_cache
+                except Exception:
+                    continue
+
+        # 2. Tier-2: Static components.json Fallback
+        components_fallback = self._load_components_json()
+        if components_fallback:
+            self._save_disk_cache(components_fallback)
+            self._memory_cache = components_fallback
             return self._memory_cache
 
-        # Attempt to harvest from remote / local Storybook URL if configured
-        if self.endpoint_url and self.endpoint_url.startswith("http"):
-            try:
-                index_url = self.endpoint_url.rstrip("/") + "/index.json"
-                with httpx.Client(timeout=3.0) as client:
-                    resp = client.get(index_url)
-                    if resp.status_code == 200:
-                        stories_data = resp.json()
-                        harvested = self._parse_storybook_index(stories_data)
-                        combined = {**OFFLINE_CARBON_CATALOG, **harvested}
-                        self._save_disk_cache(combined)
-                        self._memory_cache = combined
-                        return self._memory_cache
-            except Exception:
-                # Network down, fallback gracefully
-                pass
-
-        # Check for local static storybook-static/index.json
-        local_index = REPO_ROOT / "storybook-static" / "index.json"
-        if local_index.exists():
-            try:
-                with open(local_index, "r", encoding="utf-8") as f:
-                    stories_data = json.load(f)
-                    harvested = self._parse_storybook_index(stories_data)
-                    combined = {**OFFLINE_CARBON_CATALOG, **harvested}
-                    self._save_disk_cache(combined)
-                    self._memory_cache = combined
-                    return self._memory_cache
-            except Exception:
-                pass
+        # 3. Tier-3: Local Disk Cache Fallback (.cache/storybook_catalog.json)
+        disk_data = self._load_disk_cache()
+        if disk_data:
+            self._memory_cache = disk_data
+            return self._memory_cache
 
         # Final resilient baseline
         self._memory_cache = OFFLINE_CARBON_CATALOG
@@ -203,13 +210,20 @@ class StorybookConnector:
 
     def _parse_storybook_index(self, data: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         """Parses Storybook v7+ index.json into structured component specifications."""
-        result: Dict[str, Dict[str, Any]] = {}
+        result: Dict[str, Dict[str, Any]] = dict(self._load_components_json() or {})
         entries = data.get("entries", {}) or data.get("stories", {})
+        package_name = os.getenv("DESIGN_SYSTEM_PACKAGE", "@wbg/design-system")
         for key, entry in entries.items():
-            comp_name = entry.get("title", "").split("/")[-1] or entry.get("name", "")
+            title_parts = [p.strip() for p in entry.get("title", "").split("/") if p.strip()]
+            if len(title_parts) >= 2 and title_parts[0].lower() in ("components", "patterns", "elements"):
+                comp_name = title_parts[1]
+            elif title_parts:
+                comp_name = title_parts[-1]
+            else:
+                comp_name = entry.get("name", "")
+
             if not comp_name or comp_name in result:
                 continue
-            package_name = os.getenv("DESIGN_SYSTEM_PACKAGE", "@carbon/react")
             result[comp_name] = {
                 "import_statement": f"import {{ {comp_name} }} from '{package_name}';",
                 "description": f"Enterprise design system {comp_name} component from {entry.get('title', 'catalog')}.",

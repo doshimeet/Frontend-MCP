@@ -1,12 +1,12 @@
 import React from "react";
 import type { Metadata } from "next";
-import "./globals.scss";
-import { AppShell } from "@/components/AppShell";
+import "./globals.css";
+import { Base } from "@/components/Base";
 
 export const metadata: Metadata = {
-  title: "Enterprise Digital Platform | Design System & Generation Engine",
+  title: "World Bank Group Operations Portal | Enterprise Platform",
   description:
-    "AI-Native Enterprise Design System Starter Kit powered by Next.js and IBM Carbon Design System.",
+    "AI-Native Enterprise Design System Starter Kit powered by Next.js and WBG Design System.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        <Base>{children}</Base>
       </body>
     </html>
   );

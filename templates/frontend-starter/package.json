@@ -13,14 +13,11 @@
     "test:report": "node scripts/generate-scorecard.mjs"
   },
   "dependencies": {
-    "@carbon/icons-react": "^11.50.0",
-    "@carbon/react": "^1.68.0",
-    "@carbon/styles": "^1.68.0",
+    "@wbg/design-system": "^1.0.0",
     "@tanstack/react-query": "^5.56.2",
     "next": "^14.2.13",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "sass": "^1.79.4"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.2",

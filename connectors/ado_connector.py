@@ -42,29 +42,60 @@ class AzureDevOpsConnector:
     def refresh_starter_snapshot(self) -> bool:
         """
         Attempts to refresh the local fallback starter snapshot from Azure DevOps during cloud startup.
-        Keeps previous valid snapshot and continues if fetch fails.
+        Uses POSIX atomic directory staging and swap (.staging -> .bak) to guarantee:
+        1. No partially copied/corrupt template states on download or extraction failure.
+        2. Upstream deleted files are properly removed.
+        3. Automatic rollback to previous valid snapshot if validation fails.
         """
-        if not self.is_authenticated():
+        from config import IS_LIVE_ADO_CONFIGURED
+        if not (IS_LIVE_ADO_CONFIGURED and self.is_authenticated()):
             return False
+
+        staging_dir = TEMPLATES_DIR.parent / f"{TEMPLATES_DIR.name}.staging"
+        backup_dir = TEMPLATES_DIR.parent / f"{TEMPLATES_DIR.name}.bak"
+
         try:
-            import tempfile
-            with tempfile.TemporaryDirectory() as temp_dir:
-                temp_path = Path(temp_dir)
-                res = self.download_starter_archive(temp_path)
-                if res.get("success") and res.get("source") == "azure_devops_rest_api":
-                    TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
-                    for item in temp_path.iterdir():
-                        dest = TEMPLATES_DIR / item.name
-                        if item.is_dir():
-                            if dest.exists():
-                                shutil.rmtree(dest)
-                            shutil.copytree(item, dest)
-                        else:
-                            shutil.copy2(item, dest)
-                    return True
+            # 1. Clean any leftover staging directory
+            if staging_dir.exists():
+                shutil.rmtree(staging_dir)
+            staging_dir.mkdir(parents=True, exist_ok=True)
+
+            # 2. Download and unpack directly into staging
+            res = self.download_starter_archive(staging_dir)
+            if not (res.get("success") and res.get("source") == "azure_devops_rest_api"):
+                if staging_dir.exists():
+                    shutil.rmtree(staging_dir)
+                return False
+
+            # 3. Integrity validation: verify essential files exist and are non-empty
+            essential_files = ["package.json", "src/app/layout.tsx"]
+            for rel_file in essential_files:
+                target_check = staging_dir / rel_file
+                if not target_check.exists() or target_check.stat().st_size == 0:
+                    shutil.rmtree(staging_dir)
+                    return False
+
+            # 4. Atomic directory swap
+            if backup_dir.exists():
+                shutil.rmtree(backup_dir)
+
+            if TEMPLATES_DIR.exists():
+                shutil.move(str(TEMPLATES_DIR), str(backup_dir))
+
+            shutil.move(str(staging_dir), str(TEMPLATES_DIR))
+
+            # 5. Clean up backup on confirmed success
+            if backup_dir.exists():
+                shutil.rmtree(backup_dir)
+            return True
+
         except Exception:
-            pass
-        return False
+            # Rollback if backup exists and TEMPLATES_DIR was displaced
+            if backup_dir.exists() and not TEMPLATES_DIR.exists():
+                shutil.move(str(backup_dir), str(TEMPLATES_DIR))
+            if staging_dir.exists():
+                shutil.rmtree(staging_dir)
+            return False
 
     def download_starter_archive(self, target_directory: Path) -> Dict[str, Any]:
         """
@@ -73,8 +104,8 @@ class AzureDevOpsConnector:
         """
         target_directory.mkdir(parents=True, exist_ok=True)
 
-        is_real_ado = not self.org_url.endswith("enterprise-org")
-        if is_real_ado and self.is_authenticated():
+        from config import IS_LIVE_ADO_CONFIGURED
+        if IS_LIVE_ADO_CONFIGURED and self.is_authenticated():
             api_url = (
                 f"{self.org_url}/{self.project}/_apis/git/repositories/"
                 f"{self.repo_id}/items?recursionLevel=full&$format=zip"
@@ -95,7 +126,7 @@ class AzureDevOpsConnector:
                             "source": "azure_devops_rest_api",
                             "message": f"Successfully downloaded starter kit from Azure DevOps repo '{self.repo_id}' branch '{self.branch}'.",
                         }
-            except Exception as exc:
+            except Exception:
                 pass
 
         # Local Template Fallback (POC & Offline development)

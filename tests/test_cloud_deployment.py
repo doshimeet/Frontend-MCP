@@ -66,7 +66,8 @@ def test_live_cloud_server_health_probe():
         data = response.json()
         assert data.get("status") == "UP"
         assert data.get("transport") == "uvicorn"
-        assert data.get("service") == "enterprise-design-system-mcp"
+        assert data.get("service") in ("nexus-mcp", "nexus-design-system-mcp")
+        assert data.get("version") == "2.0.0"
     finally:
         proc.terminate()
         try:

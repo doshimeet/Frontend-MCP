@@ -25,3 +25,8 @@ class ComponentCatalogSummary(BaseModel):
     source: str = Field(description="Source of components (carbon or enterprise)")
     total_components: int = Field(description="Total components available")
     components: Dict[str, str] = Field(description="Map of component names to brief descriptions")
+
+
+class ComponentCatalogFile(BaseModel):
+    version: Optional[str] = Field(default="2.0.0", description="Schema version of catalog")
+    components: Dict[str, Dict[str, Any]] = Field(default_factory=dict, description="Component dictionary")

@@ -7,7 +7,7 @@ import {
   Tag,
   Input,
   Card,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface TimelineEvent {
   id: string;

@@ -82,7 +82,8 @@ class RequirementsService:
         is_bespoke = self._detect_bespoke_intent(requirements_text)
         active_mode = mode or ACTIVE_MODE
 
-        package_name = "@carbon/react" if active_mode == "carbon" else "@wbg/design-system"
+        from config import NEXUS_PACKAGE_NAME
+        package_name = "@carbon/react" if active_mode == "carbon" else NEXUS_PACKAGE_NAME
 
         routes: List[PlannedRoute] = []
 

@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  * for corporate workstation compliance and headless CI/CD execution.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './packages/recipes',
   timeout: 30 * 1000,
   expect: {
     timeout: 5000,
@@ -20,7 +20,7 @@ export default defineConfig({
     ['list']
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || '3000'}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     headless: true,
@@ -43,7 +43,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:3000',
+    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || '3000'}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

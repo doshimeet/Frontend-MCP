@@ -23,6 +23,10 @@ load_dotenv(REPO_ROOT / ".env")
 load_dotenv(Path.cwd() / ".env")
 
 # Server Transport Configuration
+SYSTEM_NAME: str = "nexus"
+SYSTEM_DISPLAY_NAME: str = "Nexus Design System"
+SYSTEM_VERSION: str = "2.0.0"
+
 MCP_MODE: Literal["stdio", "uvicorn"] = os.getenv("MCP_MODE", "stdio").lower()  # type: ignore
 MCP_HOST: str = os.getenv("MCP_HOST", "0.0.0.0")
 MCP_PORT: int = int(os.getenv("PORT", os.getenv("WEBSITES_PORT", os.getenv("MCP_PORT", "8000"))))
@@ -38,12 +42,22 @@ from core.environment import (
 )
 ACTIVE_MODE: EnvironmentMode = resolve_active_mode()
 
+# Nexus Design System Single Source of Truth Constants
+NEXUS_PACKAGE_NAME: str = os.getenv("DESIGN_SYSTEM_PACKAGE", "@wbg/nexus")
+NEXUS_PACKAGE_VERSION: str = "^2.0.0"
+NEXUS_STYLESHEET: str = "@wbg/nexus/styles.css"
+
 # Azure DevOps Configuration
 AZURE_DEVOPS_ORG: str = os.getenv("AZURE_DEVOPS_ORG", "https://dev.azure.com/enterprise-org")
 AZURE_DEVOPS_PROJECT: str = os.getenv("AZURE_DEVOPS_PROJECT", "EnterpriseDigital")
 AZURE_DEVOPS_STARTER_REPO_ID: str = os.getenv("AZURE_DEVOPS_STARTER_REPO_ID", "frontend-starter-kit")
 AZURE_DEVOPS_STARTER_BRANCH: str = os.getenv("AZURE_DEVOPS_BRANCH", "starter-kit")
 AZURE_DEVOPS_PAT: str | None = os.getenv("AZURE_DEVOPS_PAT")
+
+# Pre-flight Configuration Validation (Degraded Mode Detection)
+IS_LIVE_ADO_CONFIGURED: bool = bool(
+    os.getenv("AZURE_DEVOPS_ORG") and not os.getenv("AZURE_DEVOPS_ORG", "").endswith("enterprise-org")
+)
 
 # Artifactory / NPM Registry Configuration
 ARTIFACTORY_NPM_REGISTRY: str = os.getenv(
@@ -62,6 +76,10 @@ COMPONENTS_JSON_PATH = REPO_ROOT / "components.json"
 STORYBOOK_URL = os.getenv("STORYBOOK_URL", "https://storybook.internal.company.com")
 STORYBOOK_MANIFEST_PATH = os.getenv("STORYBOOK_MANIFEST_PATH", "/design-system/index.json")
 CARBON_STORYBOOK_URL = "https://react.carbondesignsystem.com"
+
+IS_LIVE_STORYBOOK_CONFIGURED: bool = bool(
+    os.getenv("STORYBOOK_URL") and not "storybook.internal.company.com" in os.getenv("STORYBOOK_URL", "")
+)
 
 
 def get_target_workspace(target_path: str | None = None) -> Path:

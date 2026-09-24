@@ -1,6 +1,6 @@
-# Master Production Deployment Runbook: Azure App Service QA Slot FastMCP Engine
+# Master Production Deployment Runbook: Nexus Design System (v2.0.0) Azure App Service QA Slot FastMCP Engine
 
-A complete, zero-omission enterprise guide detailing how to configure, deploy, and operate the **AI-Native Enterprise Design System FastMCP Server** on **Azure App Service Linux (Python 3.11 Runtime)** across deployment slots (QA $\rightarrow$ Production), integrate with World Bank Group internal digital assets (`@wbg/design-system`), and connect AI coding agents (Antigravity, GitHub Copilot in VS Code, Claude Code).
+A complete, zero-omission enterprise guide detailing how to configure, deploy, and operate the **Nexus Design System FastMCP Server (v2.0.0)** on **Azure App Service Linux (Python 3.11 Runtime)** across deployment slots (QA $\rightarrow$ Production), integrate with World Bank Group internal digital assets (`@wbg/nexus`), and connect AI coding agents (Antigravity, GitHub Copilot in VS Code, Claude Code).
 
 ---
 
@@ -45,7 +45,7 @@ A complete, zero-omission enterprise guide detailing how to configure, deploy, a
   │   │                                                                                                                │
   │   └── [Embedded Baseline Assets]                                                                                   │
   │       ├── packages/tokens/       ──► DTCG Standard Tokens (wbg-enterprise.json, enterprise-dark.json)               │
-  │       ├── packages/recipes/      ──► Canonical Recipes (@wbg/design-system shadcn architecture)                    │
+  │       ├── packages/recipes/      ──► Canonical Recipes (@wbg/nexus shadcn architecture)                    │
   │       └── templates/frontend-starter/ ──► Next.js 14 Corporate Starter Kit (MSAL, AppInsights, AdobeAnalytics)     │
   └───────────────────────────┬────────────────────────────────────────────────────────┬───────────────────────────────┘
                               │                                                        │
@@ -75,8 +75,8 @@ A complete, zero-omission enterprise guide detailing how to configure, deploy, a
 | **Container Engine**| **Zero Docker** | Dockerfile and container registry retired |
 | **Liveness Probe** | `GET /health` | Unauthenticated HTTP 200 JSON status |
 | **Transport** | Server-Sent Events (SSE) | Authenticated via `MCP_API_KEY` header |
-| **Design System** | `@wbg/design-system@version` | Internal Artifactory package (`design-system-shadcn-1`) |
-| **Global Styles** | `@wbg/design-system/styles.css` | Plain CSS import in `globals.css` / `layout.tsx` |
+| **Design System** | `@wbg/nexus@version` | Internal Artifactory package (`design-system-shadcn-1`) |
+| **Global Styles** | `@wbg/nexus/styles.css` | Plain CSS import in `globals.css` / `layout.tsx` |
 | **Artifactory Auth**| Workstation / CI/CD Global | **Zero `.npmrc`** in Git repository |
 | **Storybook URL** | `https://storybook.internal.company.com` | Configurable via `STORYBOOK_URL` app setting |
 | **Storybook Path**| `/design-system/index.json` | Harvester prioritizes `/design-system/index.json` |
@@ -165,8 +165,8 @@ Once running, the QA slot exposes three endpoints:
      ```json
      {
        "status": "UP",
-       "service": "enterprise-design-system-mcp",
-       "version": "1.0.0",
+       "service": "nexus-mcp",
+       "version": "2.0.0",
        "transport": "uvicorn"
      }
      ```
@@ -186,7 +186,7 @@ Once running, the QA slot exposes three endpoints:
 {
   "mcp": {
     "servers": {
-      "enterprise-design-system": {
+      "nexus-design-system": {
         "url": "https://wbg-mcp-service-qa.azurewebsites.net/sse",
         "headers": {
           "Authorization": "Bearer YOUR_MCP_API_KEY_HERE"
@@ -201,7 +201,7 @@ Once running, the QA slot exposes three endpoints:
 ```json
 {
   "mcpServers": {
-    "enterprise-design-system": {
+    "nexus-design-system": {
       "serverUrl": "https://wbg-mcp-service-qa.azurewebsites.net/sse",
       "headers": {
         "Authorization": "Bearer YOUR_MCP_API_KEY_HERE"
@@ -258,10 +258,10 @@ When developers invoke `create_enterprise_app` through the cloud MCP server:
    - `src/services/` & `src/data/` (Clean service layer separation)
    - `web.config` and `copymain.js` (Azure App Service IIS / Node hosting)
    - `src/tests/home.spec.ts` (Playwright E2E suite)
-   - Plain CSS tokens importing `@wbg/design-system/styles.css`
+   - Plain CSS tokens importing `@wbg/nexus/styles.css`
 3. **Zero `.npmrc` Enforcement**:
    - The engine explicitly deletes any `.npmrc` file during scaffolding.
-   - Developers install `@wbg/design-system` seamlessly using their corporate laptop `~/.npmrc` or Azure DevOps `NpmAuthenticate@0` pipeline tasks without leaking credentials into Git.
+   - Developers install `@wbg/nexus` seamlessly using their corporate laptop `~/.npmrc` or Azure DevOps `NpmAuthenticate@0` pipeline tasks without leaking credentials into Git.
 
 ---
 
@@ -272,7 +272,7 @@ The MCP server operates seamlessly across 3 development environments with zero-c
 | Mode | Environment Target | Component Package | Dependency Registry | Auto-Detection Trigger |
 | :--- | :--- | :--- | :--- | :--- |
 | **`carbon`** | Local Personal Laptop | `@carbon/react` | Public npm (npmjs.com) | Default fallback when Artifactory is unreachable |
-| **`wbg`** | Local Enterprise Laptop | `@wbg/design-system` | Private Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
+| **`wbg`** | Local Enterprise Laptop | `@wbg/nexus` | Private Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
 | **`cloud`** | Azure App Service Container | Dynamic (`@carbon/react` / `@wbg`) | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
 
 ### Dynamic Port Probing Chain

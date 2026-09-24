@@ -51,7 +51,7 @@ def test_starter_kit_package_json_dependencies():
     assert "next" in deps
     assert "react" in deps
     assert "react-dom" in deps
-    assert "@wbg/design-system" in deps
+    assert "@wbg/nexus" in deps
     assert "@tanstack/react-query" in deps
 
 

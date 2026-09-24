@@ -26,7 +26,8 @@ async def test_health_probe_returns_200():
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "UP"
-        assert data["service"] == "enterprise-design-system-mcp"
+        assert data["service"] in ("nexus-mcp", "nexus-design-system-mcp")
+        assert data["version"] == "2.0.0"
 
 
 @pytest.mark.anyio
@@ -114,4 +115,4 @@ async def test_fastmcp_read_resource_tokens():
     contents = await mcp.read_resource("design://tokens/default")
     assert len(contents) >= 1
     assert "primary" in contents[0].content
-    assert "#0f62fe" in contents[0].content
+    assert "#002244" in contents[0].content

@@ -11,7 +11,7 @@ import {
   Button,
   Tag,
   Input,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface TableItem {
   id: string;

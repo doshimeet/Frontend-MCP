@@ -149,12 +149,27 @@ class StorybookConnector:
             pass
 
     def _load_components_json(self) -> Optional[Dict[str, Dict[str, Any]]]:
-        """Loads static Tier-2 fallback from components.json."""
+        """Loads static Tier-2 fallback from components.json, unwrapping nested schemas if needed."""
         from config import COMPONENTS_JSON_PATH
         if COMPONENTS_JSON_PATH.exists():
             try:
                 with open(COMPONENTS_JSON_PATH, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    raw_data = json.load(f)
+                if not isinstance(raw_data, dict):
+                    return None
+                
+                # Defensively unwrap if schema is wrapped, e.g. {"version": 2, "components": {...}}
+                if "components" in raw_data and isinstance(raw_data["components"], dict):
+                    components_dict = raw_data["components"]
+                else:
+                    components_dict = raw_data
+
+                # Filter to only valid dictionary component specifications
+                clean_catalog: Dict[str, Dict[str, Any]] = {}
+                for k, v in components_dict.items():
+                    if isinstance(v, dict):
+                        clean_catalog[k] = v
+                return clean_catalog if clean_catalog else None
             except Exception:
                 return None
         return None
@@ -163,14 +178,15 @@ class StorybookConnector:
         """
         Dynamically harvests component definitions according to enterprise 3-tier priority:
         1. Live Storybook endpoint (/design-system/index.json or /index.json)
-        2. Static components.json fallback (reflecting @wbg/design-system)
+        2. Static components.json fallback (reflecting @wbg/nexus)
         3. Local disk cache (.cache/storybook_catalog.json)
         """
         if self._memory_cache is not None:
             return self._memory_cache
 
         # 1. Tier-1: Live Storybook Harvesting
-        if self.endpoint_url and self.endpoint_url.startswith("http"):
+        from config import IS_LIVE_STORYBOOK_CONFIGURED
+        if IS_LIVE_STORYBOOK_CONFIGURED and self.endpoint_url and self.endpoint_url.startswith("http"):
             from config import STORYBOOK_MANIFEST_PATH
             endpoints_to_try = [
                 self.endpoint_url.rstrip("/") + STORYBOOK_MANIFEST_PATH,
@@ -179,7 +195,7 @@ class StorybookConnector:
             ]
             for url in endpoints_to_try:
                 try:
-                    with httpx.Client(timeout=3.0) as client:
+                    with httpx.Client(timeout=2.0) as client:
                         resp = client.get(url)
                         if resp.status_code == 200:
                             stories_data = resp.json()
@@ -200,9 +216,12 @@ class StorybookConnector:
 
         # 3. Tier-3: Local Disk Cache Fallback (.cache/storybook_catalog.json)
         disk_data = self._load_disk_cache()
-        if disk_data:
-            self._memory_cache = disk_data
-            return self._memory_cache
+        if disk_data and isinstance(disk_data, dict):
+            # Clean disk cache defensively
+            clean_disk = {k: v for k, v in disk_data.items() if isinstance(v, dict)}
+            if clean_disk:
+                self._memory_cache = clean_disk
+                return self._memory_cache
 
         # Final resilient baseline
         self._memory_cache = OFFLINE_CARBON_CATALOG
@@ -212,7 +231,7 @@ class StorybookConnector:
         """Parses Storybook v7+ index.json into structured component specifications."""
         result: Dict[str, Dict[str, Any]] = dict(self._load_components_json() or {})
         entries = data.get("entries", {}) or data.get("stories", {})
-        package_name = os.getenv("DESIGN_SYSTEM_PACKAGE", "@wbg/design-system")
+        package_name = os.getenv("DESIGN_SYSTEM_PACKAGE", "@wbg/nexus")
         for key, entry in entries.items():
             title_parts = [p.strip() for p in entry.get("title", "").split("/") if p.strip()]
             if len(title_parts) >= 2 and title_parts[0].lower() in ("components", "patterns", "elements"):
@@ -226,18 +245,23 @@ class StorybookConnector:
                 continue
             result[comp_name] = {
                 "import_statement": f"import {{ {comp_name} }} from '{package_name}';",
-                "description": f"Enterprise design system {comp_name} component from {entry.get('title', 'catalog')}.",
+                "description": f"Nexus design system {comp_name} component from {entry.get('title', 'catalog')}.",
                 "props": {},
                 "example": f"<{comp_name} />",
             }
         return result
 
     def get_catalog_summary(self, source: str = "carbon") -> Dict[str, str]:
-        """Returns map of component names to brief descriptions."""
+        """Returns map of component names to brief descriptions, guarding against non-dict entries."""
         catalog = self.harvest_catalog()
-        return {name: data.get("description", "") for name, data in catalog.items()}
+        summary: Dict[str, str] = {}
+        for name, data in catalog.items():
+            if isinstance(data, dict):
+                summary[name] = data.get("description", "")
+        return summary
 
     def get_component_spec(self, component_name: str) -> Optional[Dict[str, Any]]:
         """Returns detailed spec for a given component."""
         catalog = self.harvest_catalog()
-        return catalog.get(component_name)
+        spec = catalog.get(component_name)
+        return spec if isinstance(spec, dict) else None

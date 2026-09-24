@@ -3,7 +3,7 @@
  * Imports official World Bank Group Design System styles and DTCG CSS variables.
  */
 
-@import "@wbg/design-system/styles.css";
+@import "@wbg/nexus/styles.css";
 
 :root {
   --wbg-primary-navy: #002244;

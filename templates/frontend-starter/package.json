@@ -1,19 +1,19 @@
 {
-  "name": "enterprise-frontend-starter",
-  "version": "1.0.0",
+  "name": "nexus-frontend-starter",
+  "version": "2.0.0",
   "private": true,
-  "description": "Production-Grade Enterprise Next.js Starter Kit pre-wired with Enterprise Design System, TanStack Query, and Playwright WCAG 2.1 AA Quality Gates",
+  "description": "Production-Grade Nexus Next.js Starter Kit pre-wired with Nexus Design System, TanStack Query, and Playwright WCAG 2.1 AA Quality Gates",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test:e2e": "playwright test",
-    "test:a11y": "playwright test e2e/a11y.spec.ts",
+    "test:a11y": "playwright test src/tests/home.spec.ts",
     "test:report": "node scripts/generate-scorecard.mjs"
   },
   "dependencies": {
-    "@wbg/design-system": "^1.0.0",
+    "@wbg/nexus": "^2.0.0",
     "@tanstack/react-query": "^5.56.2",
     "next": "^14.2.13",
     "react": "^18.3.1",

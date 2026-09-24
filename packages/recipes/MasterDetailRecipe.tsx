@@ -14,7 +14,7 @@ import {
   Card,
   Tabs,
   Sheet,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface MasterDetailItem {
   id: string;

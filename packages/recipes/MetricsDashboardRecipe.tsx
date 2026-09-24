@@ -14,7 +14,7 @@ import {
   TableBody,
   TableCell,
   Button,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface KpiMetric {
   id: string;

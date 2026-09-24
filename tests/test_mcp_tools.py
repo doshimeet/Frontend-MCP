@@ -19,7 +19,7 @@ def test_token_service_retrieval():
     svc = TokenService()
     tokens = svc.get_theme_tokens("default")
     assert "primary" in tokens.color
-    assert tokens.color["primary"].value == "#0f62fe"
+    assert tokens.color["primary"].value == "#002244"
     assert "md" in tokens.spacing
 
 

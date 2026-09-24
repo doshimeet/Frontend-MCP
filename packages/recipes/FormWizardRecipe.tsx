@@ -8,7 +8,7 @@ import {
   Button,
   Alert,
   Card,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface WizardFormData {
   // Step 1: Enterprise Profile

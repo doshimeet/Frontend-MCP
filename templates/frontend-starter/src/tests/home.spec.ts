@@ -27,6 +27,6 @@ test.describe("Enterprise Operations Portal - Core Suite", () => {
   test("4. About page renders architecture specifications", async ({ page }) => {
     await page.goto("/about");
     await expect(page.getByText("About the Enterprise Operations Portal")).toBeVisible();
-    await expect(page.getByText("@wbg/design-system")).toBeVisible();
+    await expect(page.getByText("@wbg/nexus")).toBeVisible();
   });
 });

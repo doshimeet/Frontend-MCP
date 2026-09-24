@@ -7,7 +7,7 @@ import {
   Tag,
   Card,
   Tabs,
-} from "@wbg/design-system";
+} from "@wbg/nexus";
 
 export interface SettingsTabsRecipeProps {
   title?: string;

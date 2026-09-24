@@ -31,7 +31,7 @@ def test_dtcg_tokens_json_structure():
     assert "radius" in data
 
     # Verify DTCG $value attributes
-    assert data["color"]["primary"]["$value"] == "#0f62fe"
+    assert data["color"]["primary"]["$value"] == "#002244"
     assert data["color"]["primary"]["$type"] == "color"
     assert data["spacing"]["md"]["$value"] == "1rem"
     assert data["typography"]["font_family_sans"]["$value"] != ""
@@ -43,7 +43,7 @@ def test_theme_tokens_loading():
 
     # 1. Default Theme
     default_tokens = svc.get_theme_tokens("default")
-    assert default_tokens.color["primary"].value == "#0f62fe"
+    assert default_tokens.color["primary"].value == "#002244"
     assert default_tokens.color["background"].value == "#ffffff"
 
     # 2. Enterprise Dark Theme
@@ -100,7 +100,7 @@ def test_recipe_files_exist_and_contain_required_patterns():
 
         content = recipe_file.read_text(encoding="utf-8")
         assert '"use client";' in content or "'use client';" in content
-        assert "@wbg/design-system" in content
+        assert "@wbg/nexus" in content
         assert "export const" in content or "export function" in content
         assert "export default" in content
 

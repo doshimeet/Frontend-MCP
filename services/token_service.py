@@ -9,20 +9,21 @@ from typing import Dict, Any, Optional
 from config import TOKENS_DIR
 from models.tokens import TokenItem, ThemeTokens, TokenCategoryResponse
 
-# Default Embedded Tokens
+# Default Embedded Tokens (Nexus Design System v2.0.0)
 DEFAULT_RAW_TOKENS: Dict[str, Dict[str, Dict[str, str]]] = {
     "color": {
-        "primary": {"value": "#0f62fe", "type": "color", "description": "IBM Carbon / Enterprise Primary Blue"},
-        "primary_hover": {"value": "#0043ce", "type": "color"},
-        "secondary": {"value": "#393939", "type": "color"},
+        "primary": {"value": "#002244", "type": "color", "description": "Nexus Design System Deep Navy"},
+        "primary_hover": {"value": "#00172e", "type": "color"},
+        "secondary": {"value": "#0071bc", "type": "color", "description": "Nexus Accent Blue"},
+        "secondary_hover": {"value": "#005a96", "type": "color"},
         "danger": {"value": "#da1e28", "type": "color"},
         "success": {"value": "#24a148", "type": "color"},
         "warning": {"value": "#f1c21b", "type": "color"},
         "background": {"value": "#ffffff", "type": "color"},
-        "surface": {"value": "#f4f4f4", "type": "color"},
-        "text_primary": {"value": "#161616", "type": "color"},
-        "text_secondary": {"value": "#525252", "type": "color"},
-        "border_subtle": {"value": "#e0e0e0", "type": "color"},
+        "surface": {"value": "#f4f6f8", "type": "color"},
+        "text_primary": {"value": "#222222", "type": "color"},
+        "text_secondary": {"value": "#555555", "type": "color"},
+        "border_subtle": {"value": "#d0d7de", "type": "color"},
     },
     "spacing": {
         "xs": {"value": "0.25rem", "type": "spacing"},
@@ -33,8 +34,8 @@ DEFAULT_RAW_TOKENS: Dict[str, Dict[str, Dict[str, str]]] = {
         "2xl": {"value": "3rem", "type": "spacing"},
     },
     "typography": {
-        "font_family_sans": {"value": "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"},
-        "font_family_mono": {"value": "'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', monospace"},
+        "font_family_sans": {"value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"},
+        "font_family_mono": {"value": "'JetBrains Mono', 'Menlo', 'DejaVu Sans Mono', monospace"},
         "font_size_sm": {"value": "0.875rem"},
         "font_size_base": {"value": "1rem"},
         "font_size_lg": {"value": "1.25rem"},
@@ -44,7 +45,7 @@ DEFAULT_RAW_TOKENS: Dict[str, Dict[str, Dict[str, str]]] = {
     "radius": {
         "none": {"value": "0px"},
         "sm": {"value": "2px"},
-        "md": {"value": "4px"},
+        "md": {"value": "6px"},
         "lg": {"value": "8px"},
     }
 }

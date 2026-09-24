@@ -16,7 +16,15 @@ from mcp.server.fastmcp import FastMCP
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from config import MCP_HOST, MCP_MODE, MCP_PORT, MCP_API_KEY
+from config import (
+    MCP_HOST,
+    MCP_MODE,
+    MCP_PORT,
+    MCP_API_KEY,
+    SYSTEM_NAME,
+    SYSTEM_DISPLAY_NAME,
+    SYSTEM_VERSION,
+)
 
 # Import Tools
 from tools.diagnostics_tools import register_diagnostics_tools
@@ -40,13 +48,13 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     stream=sys.stderr,  # Logs to stderr so stdio JSON-RPC remains clean
 )
-logger = logging.getLogger("enterprise-mcp.server")
+logger = logging.getLogger("nexus-mcp.server")
 
 # 1. Initialize FastMCP Server
 mcp = FastMCP(
-    "enterprise-design-system",
+    SYSTEM_NAME,
     instructions=(
-        "Enterprise Design System & Frontend Scaffolding Engine. "
+        f"{SYSTEM_DISPLAY_NAME} (v{SYSTEM_VERSION}) & Frontend Scaffolding Engine. "
         "Provides design tokens, IBM Carbon / Enterprise component schemas, page recipes, "
         "Azure DevOps starter kit scaffolding, and brownfield conflict detection."
     ),
@@ -98,8 +106,8 @@ async def liveness_probe(request):
     """
     return JSONResponse({
         "status": "UP",
-        "service": "enterprise-design-system-mcp",
-        "version": "1.0.0",
+        "service": f"{SYSTEM_NAME}-mcp",
+        "version": SYSTEM_VERSION,
         "transport": os.getenv("MCP_MODE", MCP_MODE),
     })
 

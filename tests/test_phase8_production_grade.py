@@ -33,9 +33,11 @@ from server import mcp
 
 def test_environment_mode_resolution():
     """Verify 3-mode resolution: carbon, wbg, cloud, and manual overrides."""
-    # 1. Explicit override to carbon
+    # 1. Explicit override to standalone (and legacy carbon alias)
+    os.environ["DESIGN_SYSTEM_MODE"] = "standalone"
+    assert resolve_active_mode() == "standalone"
     os.environ["DESIGN_SYSTEM_MODE"] = "carbon"
-    assert resolve_active_mode() == "carbon"
+    assert resolve_active_mode() == "standalone"
 
     # 2. Explicit override to wbg
     os.environ["DESIGN_SYSTEM_MODE"] = "wbg"

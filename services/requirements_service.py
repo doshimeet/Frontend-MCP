@@ -83,9 +83,7 @@ class RequirementsService:
         active_mode = mode or ACTIVE_MODE
 
         from config import NEXUS_PACKAGE_NAME
-        if active_mode == "carbon":
-            package_name = "@carbon/react"
-        elif active_mode == "standalone":
+        if active_mode == "standalone":
             package_name = "Standalone (Tailwind CSS + Nexus Tokens)"
         else:
             package_name = NEXUS_PACKAGE_NAME
@@ -130,7 +128,7 @@ class RequirementsService:
                 title=f"{entity_title} Overview & Operations",
                 layout_type="recipe",
                 recipe="MetricsDashboardRecipe",
-                components=["Tile", "Tag", "DataTable", "SkeletonText", "Button"] if active_mode == "carbon" else ["Card", "Badge", "Table", "Button"],
+                components=["Card", "Badge", "Table", "Button"],
                 composition_guide=f"Pre-wired executive metrics dashboard importing from {package_name}.",
                 suggested_test_file="src/tests/home.spec.ts",
                 purpose="Executive operational landing page with summary metrics and quick actions.",
@@ -165,7 +163,7 @@ class RequirementsService:
                     title=f"{entity_title} Directory & Management",
                     layout_type="recipe",
                     recipe="CrudTableRecipe",
-                    components=["DataTable", "TextInput", "Tag", "Button", "Modal", "Pagination"] if active_mode == "carbon" else ["Table", "Input", "Tag", "Button", "Dialog"],
+                    components=["Table", "Input", "Tag", "Button", "Dialog"],
                     composition_guide=f"Accessible tabular record viewer with filters and pagination importing from {package_name}.",
                     suggested_test_file=f"src/tests/{primary_entity}.spec.ts",
                     purpose=f"Tabular {entity_title.lower()} viewer with search, filtering, and state management.",
@@ -178,7 +176,7 @@ class RequirementsService:
                     title=f"New {entity_title.rstrip('s')} Intake & Setup Wizard",
                     layout_type="recipe",
                     recipe="FormWizardRecipe",
-                    components=["TextInput", "Select", "Button", "Modal"] if active_mode == "carbon" else ["Input", "Select", "Button", "Dialog"],
+                    components=["Input", "Select", "Button", "Dialog"],
                     composition_guide=f"Multi-step progressive intake form with inline validation importing from {package_name}.",
                     suggested_test_file=f"src/tests/{primary_entity}-new.spec.ts",
                     purpose="Step-by-step form collection with validation and confirmation.",
@@ -211,7 +209,7 @@ class RequirementsService:
                 (
                     "Active mode is 'standalone' (offline / personal laptop outside WBG VPN). "
                     "Assemble UI using standard React components styled with Tailwind CSS and Nexus tokens (var(--nexus-*)). "
-                    "Do NOT import '@wbg/nexus' or '@carbon/react', and NEVER synthesize fake mock packages or symlinks."
+                    "Do NOT import '@wbg/nexus', and NEVER synthesize fake mock packages or symlinks."
                     if active_mode == "standalone"
                     else f"Active mode is '{active_mode}'. Use components from '{package_name}'."
                 ),

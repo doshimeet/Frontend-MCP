@@ -1,6 +1,6 @@
 {
   "$schema": "https://design-tokens.github.io/community-group/format/",
-  "$description": "Enterprise B2B High-Density Dark Theme Palette (IBM Carbon Dark G90/G100 Aligned)",
+  "$description": "Enterprise B2B High-Density Dark Theme Palette (World Bank Group High-Contrast Aligned)",
   "color": {
     "$type": "color",
     "$description": "Dark theme color token overrides",
@@ -52,12 +52,12 @@
     "background": {
       "$value": "#161616",
       "$type": "color",
-      "$description": "Base dark canvas background (Carbon G100)"
+      "$description": "Base dark canvas background"
     },
     "surface": {
       "$value": "#262626",
       "$type": "color",
-      "$description": "Container, table row, and sidebar surface layer (Carbon G90)"
+      "$description": "Container, table row, and sidebar surface layer"
     },
     "surface_raised": {
       "$value": "#393939",

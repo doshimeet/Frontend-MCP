@@ -271,9 +271,13 @@ The MCP server operates seamlessly across 3 development environments with zero-c
 
 | Mode | Environment Target | Component Package | Dependency Registry | Auto-Detection Trigger |
 | :--- | :--- | :--- | :--- | :--- |
-| **`carbon`** | Local Personal Laptop | `@carbon/react` | Public npm (npmjs.com) | Default fallback when Artifactory is unreachable |
+| **`standalone`** | Local Personal Laptop / Offline Outside VPN | Pure React + Tailwind CSS + `nexus-tokens.css` | Public npm (Zero private package required) | Default fallback when Artifactory is unreachable |
 | **`wbg`** | Local Enterprise Laptop | `@wbg/nexus` | Private Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
-| **`cloud`** | Azure App Service Container | Dynamic (`@carbon/react` / `@wbg`) | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
+| **`cloud`** | Azure App Service Container | Official `@wbg/nexus` / Standalone Engine | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
+
+### 7.1 Native Tailwind CSS Compilation & Zero-Mock Policy
+1. **Native Tailwind Pipeline**: The starter template compiles Tailwind CSS via `postcss.config.mjs` and `tailwind.config.ts`, directly mapping DTCG design tokens (`--nexus-color-*`, `--nexus-elevation-*`). Utility classes (`flex`, `grid`, `justify-between`, `gap-4`) compile natively without requiring private package downloads.
+2. **Strict Zero-Mock Policy**: Codified in `.agents/skills/wbg-enterprise-rules.md` (Section 1.4), AI coding agents are strictly forbidden from synthesizing fake mock packages (e.g. `src/nexus/index.tsx`) or manual `node_modules` symlinks. When private packages are unavailable, agents compose standard React, Tailwind CSS, and Nexus token CSS variables directly.
 
 ### Dynamic Port Probing Chain
 To avoid rigid localhost assumptions, the runtime probes candidate ports in order:

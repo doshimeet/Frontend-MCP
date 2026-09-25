@@ -68,7 +68,7 @@ export async function auditPage(page, options = {}) {
   // Generate remediation advice based on design system rules
   const remediations = results.violations.map((v) => {
     if (v.id === 'color-contrast') {
-      return `[Token Contrast] Rule '${v.id}': Use IBM Carbon / Design System high-contrast tokens ($text-primary: #161616, $interactive: #0f62fe). Current text violates 4.5:1 ratio.`;
+      return `[Token Contrast] Rule '${v.id}': Use Nexus Design System high-contrast tokens (var(--nexus-color-text-primary): #222222, var(--nexus-color-secondary): #0071bc). Current text violates 4.5:1 ratio.`;
     }
     if (v.id === 'button-name') {
       return `[Micro-copy / Clarify] Rule '${v.id}': Button is missing discernible accessible text or aria-label. Provide an action verb label.`;

@@ -34,7 +34,7 @@ try {
   const markdown = `# Enterprise Quality & Accessibility Audit Scorecard
 
 > **Target Application**: Enterprise Next.js Application  
-> **Evaluation Standards**: WCAG 2.1 Level AA, IBM Carbon / DTCG Compliance, Zero Regressions  
+> **Evaluation Standards**: WCAG 2.1 Level AA, Nexus Design System / DTCG Compliance, Zero Regressions  
 > **Timestamp**: ${new Date().toISOString()}  
 
 ---

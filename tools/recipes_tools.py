@@ -143,13 +143,8 @@ def register_recipes_tools(mcp: FastMCP) -> None:
             states_handled = ["loading", "empty", "error", "success"]
             a11y_compliance = "WCAG 2.1 AA compliant with semantic landmarks"
 
-        # If running in Carbon or Standalone mode, provide mode-specific annotations
-        if active_mode == "carbon" and "@wbg/design-system" in component_code:
-            component_code = (
-                "// [Active Mode: Carbon - Public npm @carbon/react compatibility]\n"
-                + component_code
-            )
-        elif active_mode == "standalone":
+        # Provide mode-specific annotations for standalone execution
+        if active_mode == "standalone":
             component_code = (
                 "// [Active Mode: Standalone - Pure React + Tailwind CSS + Nexus Tokens (Zero Private NPM Package Required)]\n"
                 + component_code

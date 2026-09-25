@@ -1,8 +1,8 @@
 """
 Enterprise Multi-Environment & Mode Auto-Detection Module
 Supports 3 operational modes:
-1. 'carbon': Local non-enterprise / personal laptop (public npm @carbon/react, zero corporate VPN/Artifactory needed)
-2. 'wbg': Local enterprise World Bank Group workstation (@wbg/design-system, private Artifactory)
+1. 'standalone': Local non-enterprise / personal laptop (React + Tailwind CSS + nexus-tokens.css, zero corporate VPN/Artifactory needed)
+2. 'wbg': Local enterprise World Bank Group workstation (@wbg/nexus, private Artifactory)
 3. 'cloud': Hosted in Azure App Service Linux Python 3.11 container (Oryx, SSE, ADO REST)
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Literal, Optional, List
 import urllib.request
 
-EnvironmentMode = Literal["standalone", "wbg", "cloud", "carbon"]
+EnvironmentMode = Literal["standalone", "wbg", "cloud"]
 
 CANDIDATE_DEV_PORTS: List[int] = [3000, 3001, 4200, 5173]
 
@@ -92,13 +92,15 @@ def has_wbg_credentials() -> bool:
 def resolve_active_mode() -> EnvironmentMode:
     """
     Resolves the active operational mode across environments:
-    - Manual override via DESIGN_SYSTEM_MODE ('standalone', 'wbg', 'cloud', 'carbon')
+    - Manual override via DESIGN_SYSTEM_MODE ('standalone', 'wbg', 'cloud')
     - Cloud: Detected via WEBSITE_SITE_NAME or MCP_MODE == 'uvicorn'
     - Local WBG: Detected via reachable Artifactory or active Azure DevOps PAT
     - Local Standalone (Fallback): For personal laptops / non-enterprise machines without Artifactory
     """
     explicit = os.getenv("DESIGN_SYSTEM_MODE", "auto").strip().lower()
-    if explicit in ("standalone", "wbg", "cloud", "carbon"):
+    if explicit == "carbon":
+        return "standalone"
+    if explicit in ("standalone", "wbg", "cloud"):
         return explicit  # type: ignore
 
     # 1. Cloud Mode (Azure App Service)
@@ -111,3 +113,4 @@ def resolve_active_mode() -> EnvironmentMode:
 
     # 3. Local Standalone Mode (Fallback for personal laptops and offline development outside WBG VPN)
     return "standalone"
+

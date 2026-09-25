@@ -25,11 +25,11 @@ The system supports 3 operational environments with zero-config auto-detection:
 
 | Mode | Environment | Component Package | Dependency Target | Detection Mechanism |
 | :--- | :--- | :--- | :--- | :--- |
-| **`carbon`** | Local Personal / Non-Enterprise | `@carbon/react` | Public npm (npmjs.com) | Default fallback; zero VPN or Artifactory credentials needed |
-| **`wbg`** | Local Enterprise Workstation | `@wbg/design-system` | Private WBG Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
-| **`cloud`** | Azure App Service Container | Dynamic (`@carbon/react` / `@wbg`) | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
+| **`standalone`** | Local Personal / Offline Outside VPN | Pure React + Tailwind CSS + `nexus-tokens.css` | Public npm (Zero private package required) | Default fallback; zero corporate VPN or Artifactory needed |
+| **`wbg`** | Local Enterprise Workstation | `@wbg/nexus` | Private WBG Artifactory | Active Azure DevOps PAT or reachable internal Artifactory |
+| **`cloud`** | Azure App Service Container | Official `@wbg/nexus` / Standalone Engine | Linux Python 3.11 / Oryx | `WEBSITE_SITE_NAME` or `MCP_MODE=uvicorn` |
 
-*Override*: Developers can explicitly enforce mode via `DESIGN_SYSTEM_MODE=carbon|wbg|cloud`.
+*Override*: Developers can explicitly enforce mode via `DESIGN_SYSTEM_MODE=standalone|wbg|cloud`.
 
 ---
 

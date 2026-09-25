@@ -4,12 +4,16 @@ Integrates security sandboxing with Azure DevOps repository downloads.
 """
 
 import json
+import logging
 import shutil
 import subprocess
+import time
 from pathlib import Path
 from connectors.ado_connector import AzureDevOpsConnector
 from services.security_service import SecurityService, SecurityException
 from models.scaffolding import ScaffoldResult
+
+logger = logging.getLogger("nexus-mcp.scaffolding")
 
 
 class ScaffoldingService:
@@ -90,9 +94,13 @@ class ScaffoldingService:
         git_bin = shutil.which("git")
         if git_bin:
             try:
-                subprocess.run([git_bin, "init"], cwd=target_path, check=True, capture_output=True)
-            except Exception:
-                pass
+                logger.info("[scaffold:git] Initializing git repository at '%s' (timeout=10.0s)...", target_path)
+                subprocess.run([git_bin, "init"], cwd=target_path, check=True, capture_output=True, timeout=10.0)
+                logger.info("[scaffold:git] Git repository successfully initialized.")
+            except subprocess.TimeoutExpired:
+                logger.warning("[scaffold:git] 'git init' timed out after 10.0s. Continuing without git tracking.")
+            except Exception as exc:
+                logger.warning("[scaffold:git] 'git init' failed: %s. Continuing without git tracking.", exc)
 
         return ScaffoldResult(
             success=True,

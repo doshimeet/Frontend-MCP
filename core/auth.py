@@ -2,6 +2,7 @@
 Azure MSAL & Enterprise Authentication Provider
 Supports DefaultAzureCredential (az login, Managed Identity, App Registration)
 with fallback to personal access tokens.
+Strictly hardened against link-local IMDS hangs on enterprise developer laptops.
 """
 
 from __future__ import annotations
@@ -26,7 +27,7 @@ def get_azure_devops_token() -> Optional[str]:
     Acquires an Azure DevOps bearer token.
     1. Checks in-memory cache for valid unexpired token.
     2. In Cloud mode (Azure App Service): Managed Identity via DefaultAzureCredential is primary.
-    3. In Local mode: Fast-path AZURE_DEVOPS_PAT avoids probe hangs, with fallback to DefaultAzureCredential.
+    3. In Local mode: Fast-path AZURE_DEVOPS_PAT avoids probe hangs; otherwise local az login session.
     4. Caches acquired tokens with 5-minute safety margin.
     """
     global _TOKEN_CACHE
@@ -41,36 +42,54 @@ def get_azure_devops_token() -> Optional[str]:
 
     # In Cloud runtime: Managed Identity is strictly primary
     if is_cloud_runtime:
-        token = _acquire_default_azure_credential_token()
+        logger.info("[auth] Cloud runtime detected (%s). Acquiring token via Managed Identity...", os.getenv("WEBSITE_SITE_NAME", "AppService"))
+        token = _acquire_default_azure_credential_token(is_cloud=True)
         if token:
             _TOKEN_CACHE = (token, now + 3600)
             return token
         if AZURE_DEVOPS_PAT:
+            logger.info("[auth] Falling back to configured AZURE_DEVOPS_PAT in cloud runtime.")
             return AZURE_DEVOPS_PAT
+        logger.warning("[auth] No valid Azure DevOps token acquired in cloud runtime.")
         return None
 
-    # In Local runtime: PAT is fast-path if provided; otherwise az login session
+    # In Local runtime: PAT is fast-path if provided
     if AZURE_DEVOPS_PAT:
+        logger.info("[auth] Local runtime: Fast-path AZURE_DEVOPS_PAT detected. Skipping Azure IMDS probe.")
         return AZURE_DEVOPS_PAT
 
-    token = _acquire_default_azure_credential_token()
+    logger.info("[auth] Local runtime: No PAT configured. Probing developer tools (az login / VS Code session)...")
+    token = _acquire_default_azure_credential_token(is_cloud=False)
     if token:
         _TOKEN_CACHE = (token, now + 3600)
+        logger.info("[auth] Successfully acquired token from developer login session.")
         return token
 
+    logger.info("[auth] Local runtime: No Azure DevOps credentials available. Continuing in unauthenticated mode.")
     return None
 
 
-def _acquire_default_azure_credential_token() -> Optional[str]:
-    """Attempts to acquire token from DefaultAzureCredential without interactive popup."""
+def _acquire_default_azure_credential_token(is_cloud: bool = False) -> Optional[str]:
+    """
+    Attempts to acquire token from DefaultAzureCredential without interactive popup.
+    On local workstations, suppresses ManagedIdentity / WorkloadIdentity to avoid
+    stalling behind corporate firewalls on link-local IMDS (169.254.169.254).
+    """
     try:
         from azure.identity import DefaultAzureCredential
-        credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
+        if is_cloud:
+            credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
+        else:
+            credential = DefaultAzureCredential(
+                exclude_interactive_browser_credential=True,
+                exclude_managed_identity_credential=True,
+                exclude_workload_identity_credential=True,
+            )
         access_token = credential.get_token(AZURE_DEVOPS_RESOURCE_SCOPE)
         if access_token and access_token.token:
             return access_token.token
     except Exception as exc:
-        logger.debug("DefaultAzureCredential token acquisition unavailable: %s", exc)
+        logger.debug("[auth] DefaultAzureCredential token acquisition unavailable: %s", exc)
     return None
 
 
@@ -81,7 +100,7 @@ def get_ado_headers() -> dict[str, str]:
     token = get_azure_devops_token()
     headers = {
         "Accept": "application/zip, application/json",
-        "User-Agent": "Enterprise-Design-System-MCP/1.0",
+        "User-Agent": "Enterprise-Design-System-MCP/2.0",
     }
     if token:
         # If token is standard PAT, basic auth is supported, or Bearer for OAuth2/MSAL

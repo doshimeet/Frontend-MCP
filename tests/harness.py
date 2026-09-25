@@ -24,7 +24,7 @@ sys.path.insert(0, str(SERVER_DIR))
 from services.health_service import HealthService
 from services.token_service import TokenService
 from services.requirements_service import RequirementsService
-from connectors.storybook_connector import OFFLINE_CARBON_CATALOG
+from connectors.storybook_connector import OFFLINE_NEXUS_CATALOG
 from config import RECIPES_DIR
 
 health_svc = HealthService()
@@ -76,16 +76,16 @@ def main():
 
     if args.command == "components":
         print("\n=== COMPONENT CATALOG ===")
-        summary = {k: v["description"] for k, v in OFFLINE_CARBON_CATALOG.items()}
+        summary = {k: v["description"] for k, v in OFFLINE_NEXUS_CATALOG.items()}
         print(json.dumps(summary, indent=2))
         return
 
     if args.command == "props":
         print(f"\n=== COMPONENT SPECS ({args.name}) ===")
-        if args.name in OFFLINE_CARBON_CATALOG:
-            print(json.dumps(OFFLINE_CARBON_CATALOG[args.name], indent=2))
+        if args.name in OFFLINE_NEXUS_CATALOG:
+            print(json.dumps(OFFLINE_NEXUS_CATALOG[args.name], indent=2))
         else:
-            print(f"Component '{args.name}' not found. Available: {list(OFFLINE_CARBON_CATALOG.keys())}")
+            print(f"Component '{args.name}' not found. Available: {list(OFFLINE_NEXUS_CATALOG.keys())}")
         return
 
     if args.command == "plan":

@@ -16,6 +16,7 @@ from config import (
     AZURE_DEVOPS_ORG,
     AZURE_DEVOPS_PROJECT,
     AZURE_DEVOPS_STARTER_REPO_ID,
+    AZURE_DEVOPS_STARTER_BRANCH,
     TEMPLATES_DIR,
 )
 from core.auth import get_ado_headers
@@ -35,7 +36,9 @@ def download_ado_starter_kit(target_directory: Path) -> dict[str, Any]:
         clean_org = AZURE_DEVOPS_ORG.rstrip("/")
         api_url = (
             f"{clean_org}/{AZURE_DEVOPS_PROJECT}/_apis/git/repositories/"
-            f"{AZURE_DEVOPS_STARTER_REPO_ID}/items?recursionLevel=full&$format=zip&api-version=6.0"
+            f"{AZURE_DEVOPS_STARTER_REPO_ID}/items?recursionLevel=full&$format=zip"
+            f"&versionDescriptor.version={AZURE_DEVOPS_STARTER_BRANCH}&versionDescriptor.versionType=branch"
+            f"&api-version=6.0"
         )
         headers = get_ado_headers()
 

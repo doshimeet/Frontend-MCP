@@ -4,7 +4,7 @@
   "private": true,
   "description": "Production-Grade Nexus Next.js Starter Kit pre-wired with Nexus Design System, TanStack Query, and Playwright WCAG 2.1 AA Quality Gates",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4200",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

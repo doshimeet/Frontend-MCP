@@ -48,15 +48,15 @@ NEXUS_PACKAGE_VERSION: str = "^2.0.0"
 NEXUS_STYLESHEET: str = "@wbg/nexus/styles.css"
 
 # Azure DevOps Configuration
-AZURE_DEVOPS_ORG: str = os.getenv("AZURE_DEVOPS_ORG", "https://dev.azure.com/enterprise-org")
-AZURE_DEVOPS_PROJECT: str = os.getenv("AZURE_DEVOPS_PROJECT", "EnterpriseDigital")
-AZURE_DEVOPS_STARTER_REPO_ID: str = os.getenv("AZURE_DEVOPS_STARTER_REPO_ID", "frontend-starter-kit")
+AZURE_DEVOPS_ORG: str = os.getenv("AZURE_DEVOPS_ORG", "https://dev.azure.com/operations-and-corporate")
+AZURE_DEVOPS_PROJECT: str = os.getenv("AZURE_DEVOPS_PROJECT", "ITSDA-DATAEXPLORER")
+AZURE_DEVOPS_STARTER_REPO_ID: str = os.getenv("AZURE_DEVOPS_STARTER_REPO_ID", "ITSDA-DATAEXPLORER-FE")
 AZURE_DEVOPS_STARTER_BRANCH: str = os.getenv("AZURE_DEVOPS_BRANCH", "starter-kit")
 AZURE_DEVOPS_PAT: str | None = os.getenv("AZURE_DEVOPS_PAT")
 
 # Pre-flight Configuration Validation (Degraded Mode Detection)
 IS_LIVE_ADO_CONFIGURED: bool = bool(
-    os.getenv("AZURE_DEVOPS_ORG") and not os.getenv("AZURE_DEVOPS_ORG", "").endswith("enterprise-org")
+    AZURE_DEVOPS_ORG and not AZURE_DEVOPS_ORG.endswith("enterprise-org")
 )
 
 # Artifactory / NPM Registry Configuration
@@ -75,7 +75,6 @@ COMPONENTS_JSON_PATH = REPO_ROOT / "components.json"
 # Storybook Catalog Endpoints
 STORYBOOK_URL = os.getenv("STORYBOOK_URL", "https://storybook.internal.company.com")
 STORYBOOK_MANIFEST_PATH = os.getenv("STORYBOOK_MANIFEST_PATH", "/design-system/index.json")
-CARBON_STORYBOOK_URL = "https://react.carbondesignsystem.com"
 
 IS_LIVE_STORYBOOK_CONFIGURED: bool = bool(
     os.getenv("STORYBOOK_URL") and not "storybook.internal.company.com" in os.getenv("STORYBOOK_URL", "")

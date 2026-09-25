@@ -10,7 +10,7 @@ SERVER_DIR = Path(__file__).resolve().parent.parent / "packages" / "mcp-server"
 sys.path.insert(0, str(SERVER_DIR))
 
 from services.token_service import TokenService
-from connectors.storybook_connector import OFFLINE_CARBON_CATALOG
+from connectors.storybook_connector import OFFLINE_NEXUS_CATALOG
 from services.requirements_service import RequirementsService
 from core.router_detector import detect_project_router
 
@@ -24,17 +24,18 @@ def test_token_service_retrieval():
 
 
 def test_storybook_connector_catalog():
-    assert "Button" in OFFLINE_CARBON_CATALOG
-    assert "DataTable" in OFFLINE_CARBON_CATALOG
-    assert "Modal" in OFFLINE_CARBON_CATALOG
-    assert "TextInput" in OFFLINE_CARBON_CATALOG
-    assert "Tag" in OFFLINE_CARBON_CATALOG
-    assert "SkeletonText" in OFFLINE_CARBON_CATALOG
+    assert "Button" in OFFLINE_NEXUS_CATALOG
+    assert "Table" in OFFLINE_NEXUS_CATALOG
+    assert "Dialog" in OFFLINE_NEXUS_CATALOG
+    assert "Input" in OFFLINE_NEXUS_CATALOG
+    assert "Card" in OFFLINE_NEXUS_CATALOG
+    assert "Tabs" in OFFLINE_NEXUS_CATALOG
 
-    button = OFFLINE_CARBON_CATALOG["Button"]
+    button = OFFLINE_NEXUS_CATALOG["Button"]
     assert "props" in button
-    assert "kind" in button["props"]
+    assert "variant" in button["props"]
     assert "example" in button
+    assert "@wbg/nexus" in button["import_statement"]
 
 
 def test_requirements_service_planning():

@@ -4,6 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Enterprise Playwright Configuration for Next.js Starter Kit
  * Multi-Audience Reporting: HTML, JUnit XML (Azure DevOps CI/CD), and JSON.
  * Leverages system Edge browser (channel: 'msedge') with graceful fallback to Chrome/Chromium.
+ * Configured for standard World Bank Group port 4200 and unauthenticated E2E bypass.
  */
 export default defineConfig({
   testDir: './src/tests',
@@ -22,7 +23,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/results.json' }],
   ],
   use: {
-    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || '3000'}`,
+    baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT || '4200'}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     headless: true,
@@ -45,8 +46,12 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || '3000'}`,
-    reuseExistingServer: !process.env.CI,
+    url: process.env.BASE_URL || `http://localhost:${process.env.PORT || '4200'}`,
+    reuseExistingServer: false,
     timeout: 120 * 1000,
+    env: {
+      NEXT_AZURE_MSAL_AUTH: 'false',
+      PORT: '4200',
+    },
   },
 });

@@ -55,7 +55,7 @@ mcp = FastMCP(
     SYSTEM_NAME,
     instructions=(
         f"{SYSTEM_DISPLAY_NAME} (v{SYSTEM_VERSION}) & Frontend Scaffolding Engine. "
-        "Provides design tokens, IBM Carbon / Enterprise component schemas, page recipes, "
+        "Provides design tokens, Nexus Enterprise component schemas, page recipes, "
         "Azure DevOps starter kit scaffolding, and brownfield conflict detection."
     ),
     host=MCP_HOST,

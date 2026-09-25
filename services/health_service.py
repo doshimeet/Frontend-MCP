@@ -1,17 +1,18 @@
 """
 Health & Environment Diagnostics Service
 Runs comprehensive pre-flight verification on developer workstations or cloud containers.
+Hardened with subprocess timeouts and Windows batch shim resolution to prevent stalls.
 """
 
+import logging
 import os
-import shutil
-import subprocess
 import sys
+import time
 from pathlib import Path
 
 from config import ARTIFACTORY_NPM_REGISTRY, AZURE_DEVOPS_ORG
 from core.auth import get_azure_devops_token
-from core.health import find_system_edge_browser
+from core.health import find_system_edge_browser, resolve_binary, check_command_version
 from models.health import (
     RuntimeInfo,
     BrowserInfo,
@@ -20,31 +21,50 @@ from models.health import (
     HealthReport,
 )
 
+logger = logging.getLogger("nexus-mcp.health")
+
 
 class HealthService:
     """Performs diagnostic checks on system dependencies and enterprise authentication."""
 
     def run_diagnostics(self) -> HealthReport:
         """Collects runtime diagnostics and returns a typed HealthReport."""
-        # 1. Node.js check
-        node_bin = shutil.which("node")
-        node_ver = None
-        if node_bin:
-            try:
-                node_ver = subprocess.check_output([node_bin, "--version"], text=True).strip()
-            except Exception:
-                pass
-        node_info = RuntimeInfo(available=node_bin is not None, version=node_ver, path=node_bin)
+        start_time = time.time()
+        logger.info("[service:health] Collecting runtime diagnostics...")
 
-        # 2. npm check
-        npm_bin = shutil.which("npm")
+        # 1. Node.js check (timeout-guarded)
+        node_bin = resolve_binary("node")
+        node_ver = None
+        node_available = False
+        if node_bin:
+            success, ver, err = check_command_version(node_bin, timeout=3.0)
+            if success:
+                node_ver = ver
+                node_available = True
+            else:
+                node_ver = f"degraded: {err}"
+                node_available = False
+        else:
+            logger.warning("[service:health] Node.js binary not resolved in PATH")
+
+        node_info = RuntimeInfo(available=node_available, version=node_ver, path=node_bin)
+
+        # 2. npm check (Windows-shim and timeout-guarded)
+        npm_bin = resolve_binary("npm")
         npm_ver = None
+        npm_available = False
         if npm_bin:
-            try:
-                npm_ver = subprocess.check_output([npm_bin, "--version"], text=True).strip()
-            except Exception:
-                pass
-        npm_info = RuntimeInfo(available=npm_bin is not None, version=npm_ver, path=npm_bin)
+            success, ver, err = check_command_version(npm_bin, timeout=3.0)
+            if success:
+                npm_ver = ver
+                npm_available = True
+            else:
+                npm_ver = f"degraded: {err}"
+                npm_available = False
+        else:
+            logger.warning("[service:health] npm binary not resolved in PATH")
+
+        npm_info = RuntimeInfo(available=npm_available, version=npm_ver, path=npm_bin)
 
         # 3. System Browser check
         edge_path = find_system_edge_browser()
@@ -80,7 +100,8 @@ class HealthService:
             registry_target=ARTIFACTORY_NPM_REGISTRY,
         )
 
-        status = "healthy" if (node_bin and npm_bin) else "degraded"
+        status = "healthy" if (node_available and npm_available) else "degraded"
+        logger.info("[service:health] HealthReport generated in %.2fs. Overall status: %s", time.time() - start_time, status)
 
         return HealthReport(
             status=status,
